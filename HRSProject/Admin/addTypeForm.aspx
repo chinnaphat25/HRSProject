@@ -1,0 +1,72 @@
+﻿<%@ Page Title="ข้อมูลประเภทที่อยู่" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="addTypeForm.aspx.cs" Inherits="HRSProject.Admin.addTypeForm" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
+    <div class="row">
+        <div class="col">
+            <%if (msgErr.Text != "")
+                { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <asp:Label ID="msgErr" runat="server" Text=""></asp:Label>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <%} %>
+            <%if (msgSuccess.Text != "")
+                { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <asp:Label ID="msgSuccess" runat="server" Text=""></asp:Label>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <%} %>
+            <%if (msgAlert.Text != "")
+                { %>
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <asp:Label ID="msgAlert" runat="server" Text=""></asp:Label>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <%} %>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="col-md-2">
+            ประเภทที่อยู่ 
+            <asp:TextBox ID="txtTypeAdd" runat="server" CssClass="form-control"></asp:TextBox>
+        </div>
+        <div class="col-md-1">
+            <br />
+            <asp:Button ID="btnProfixAdd" runat="server" Text="&#xf067; เพิ่ม" Font-Size="Medium" CssClass="btn btn-success btn-sm align-items-end fa" OnClick="btnProfixAdd_Click" />
+        </div>
+    </div>
+    <hr />
+    <div class="form-row">
+        <asp:GridView ID="TypeAddGridView" runat="server"
+            DataKeyNames="type_add_id"
+            GridLines="None"
+            OnRowDataBound="TypeAddGridView_RowDataBound"
+            AutoGenerateColumns="False"
+            CssClass="table table-hover table-sm"
+            OnRowEditing="TypeAddGridView_RowEditing"
+            OnRowCancelingEdit="TypeAddGridView_RowCancelingEdit"
+            OnRowUpdating="TypeAddGridView_RowUpdating"
+            OnRowDeleting="TypeAddGridView_RowDeleting">
+            <Columns>
+                <asp:TemplateField HeaderText="ประเภทที่อยู่">
+                    <ItemTemplate>
+                        <asp:Label ID="lbTypeAdd" runat="server" Text='<%# DataBinder.Eval(Container, "DataItem.type_add_name") %>'></asp:Label>
+                    </ItemTemplate>
+                    <EditItemTemplate>
+                        <asp:TextBox ID="txtTypeAdd" size="20" runat="server" Text='<%# DataBinder.Eval(Container, "DataItem.type_add_name") %>' CssClass="form-control"></asp:TextBox>
+                    </EditItemTemplate>
+                </asp:TemplateField>
+                <asp:CommandField ShowEditButton="True" CancelText="ยกเลิก" EditText="&#xf040; แก้ไข" UpdateText="แก้ไข" HeaderText="ปรับปรุง" ControlStyle-Font-Size="Small" ControlStyle-CssClass="btn btn-outline-warning btn-sm fa" />
+                <asp:CommandField ShowDeleteButton="True" HeaderText="ลบ" DeleteText="&#xf014; ลบ" ControlStyle-CssClass="btn btn-outline-danger btn-sm fa" ControlStyle-Font-Size="Small" />
+            </Columns>
+        </asp:GridView>
+    </div>
+    <asp:Label ID="lbTypeAddNull" runat="server" Text="Label"></asp:Label>
+</asp:Content>
