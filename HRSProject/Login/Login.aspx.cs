@@ -39,46 +39,48 @@ namespace HRSProject.Login
 
                     if (!rs.IsDBNull(0))
                     {
-                        if (rs.GetString("emp_status_login") != "1")
+                        //if (rs.GetString("emp_status_login") != "1")
+                        //{
+                        // Storee Session
+                        Session.Add("User", txtUser.Text);
+                        Session.Add("UserName", rs.GetString("emp_name"));
+                        Session.Add("UserPrivilegeId", rs.GetString("privilege_id"));
+                        Session.Add("UserPrivilege", rs.GetString("privilege_name"));
+                        if (rs.GetString("privilege_id") == "5")
                         {
-                            // Storee Session
-                            Session.Add("User", txtUser.Text);
-                            Session.Add("UserName", rs.GetString("emp_name"));
-                            Session.Add("UserPrivilegeId", rs.GetString("privilege_id"));
-                            Session.Add("UserPrivilege", rs.GetString("privilege_name"));
-                            if (rs.GetString("privilege_id") == "5")
-                            {
-                                Session.Add("emp_login_id", rs.GetString("emp_user_id"));
-                            }
-                            else
-                            {
-                                Session.Add("emp_login_id", null);
-                            }
-                            Session.Timeout = 60;
-
-                            // now Storing Cookies & config.
-                            Response.Cookies["cookiesLogin"]["User"] = txtUser.Text;
-                            Response.Cookies["cookiesLogin"]["UserName"] = rs.GetString("emp_name");
-                            Response.Cookies["cookiesLogin"]["UserPrivilegeId"] = rs.GetString("privilege_id");
-                            Response.Cookies["cookiesLogin"]["UserPrivilege"] = rs.GetString("privilege_name");
-                            if (rs.GetString("privilege_id") == "5")
-                            {
-                                Response.Cookies["cookiesLogin"]["emp_login_id"] = rs.GetString("emp_user_id");
-                            }
-                            else
-                            {
-                                Response.Cookies["cookiesLogin"]["emp_login_id"] = null;
-                            }
-                            Response.Cookies["cookiesLogin"].Expires = DateTime.Now.AddDays(1);
-
-                            //Page.ClientScript.RegisterStartupScript(Page.GetType(), "Message Box", "<script language = 'javascript'>alert('dd')</script>");
-                            dBScript.userLoginUpdate(txtUser.Text);
-                            Response.Redirect("/");
+                            Session.Add("emp_login_id", rs.GetString("emp_user_id"));
                         }
                         else
                         {
-                            mess += "- ***ไม่อนุญาติให้มีการเข้าใช้งานด้วยรหัสเดียวกันซ้ำ";
+                            Session.Add("emp_login_id", null);
                         }
+                        Session.Timeout = 600;
+
+                        // now Storing Cookies & config.
+                        HttpCookie newCookie = new HttpCookie("HRSLogin");
+                        newCookie["User"] = txtUser.Text;
+                        newCookie["UserName"] = rs.GetString("emp_name");
+                        newCookie["UserPrivilegeId"] = rs.GetString("privilege_id");
+                        newCookie["UserPrivilege"] = rs.GetString("privilege_name");
+                        if (rs.GetString("privilege_id") == "5")
+                        {
+                            newCookie["emp_login_id"] = rs.GetString("emp_user_id");
+                        }
+                        else
+                        {
+                            newCookie["emp_login_id"] = null;
+                        }
+                        newCookie.Expires = DateTime.Now.AddDays(1);
+                        Response.Cookies.Add(newCookie);
+
+                        //Page.ClientScript.RegisterStartupScript(Page.GetType(), "Message Box", "<script language = 'javascript'>alert('dd')</script>");
+                        dBScript.userLoginUpdate(txtUser.Text);
+                        Response.Redirect("/");
+                        /*}
+                        else
+                        {
+                            mess += "- ***ไม่อนุญาติให้มีการเข้าใช้งานด้วยรหัสเดียวกันซ้ำ";
+                        }*/
 
                     }
                     else
@@ -110,7 +112,7 @@ namespace HRSProject.Login
         protected void btnLoginEmp_Click(object sender, EventArgs e)
         {
             MsgBox("");
-            string sql = "SELECT * FROM tbl_emp_profile WHERE emp_id_card ='" + txtLoginIDCard.Text.Trim() + "'";
+            string sql = "SELECT * FROM tbl_emp_profile WHERE emp_id_card ='" + txtLoginIDCard.Text.Trim() + "' AND emp_staus_working = '1' ORDER BY id DESC";
             MySqlDataReader rs = dBScript.selectSQL(sql);
             if (rs.Read())
             {
@@ -119,7 +121,7 @@ namespace HRSProject.Login
                 {
                     // Storee Session
                     Session.Add("User", txtUser.Text);
-                    Session.Add("UserName", rs.GetString("emp_name")+ " " +rs.GetString("emp_lname"));
+                    Session.Add("UserName", rs.GetString("emp_name") + " " + rs.GetString("emp_lname"));
                     Session.Add("UserPrivilegeId", "5");
                     Session.Add("UserPrivilege", "Employee");
                     Session.Add("emp_login_id", rs.GetString("emp_id"));
@@ -127,7 +129,7 @@ namespace HRSProject.Login
 
                     //Page.ClientScript.RegisterStartupScript(Page.GetType(), "Message Box", "<script language = 'javascript'>alert('dd')</script>");
                     //dBScript.userLoginUpdate(txtUser.Text);
-                    Response.Redirect("/Profile/empForm?empID="+dBScript.getMd5Hash(rs.GetString("emp_id")));
+                    Response.Redirect("/Profile/empForm?empID=" + dBScript.getMd5Hash(rs.GetString("emp_id")));
 
                 }
                 else

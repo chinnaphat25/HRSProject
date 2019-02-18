@@ -76,6 +76,15 @@ namespace HRSProject.Profile {
         protected global::System.Web.UI.WebControls.TextBox txtLname;
         
         /// <summary>
+        /// txtPosNum control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtPosNum;
+        
+        /// <summary>
         /// txtPos control.
         /// </summary>
         /// <remarks>

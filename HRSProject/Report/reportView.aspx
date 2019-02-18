@@ -13,8 +13,8 @@
         <div>
             <CR:CrystalReportViewer ID="resultReportLeave" runat="server"
                     EnableParameterPrompt="False" 
-                    ToolPanelView="None" GroupTreeStyle-ShowLines="False" HasCrystalLogo="False" HasToggleGroupTreeButton="False" 
-                PrintMode="ActiveX"/>
+                    ToolPanelView="None"  HasCrystalLogo="False" HasToggleGroupTreeButton="False" 
+                PrintMode="Pdf"/>
         </div>
     </form>
 </body>

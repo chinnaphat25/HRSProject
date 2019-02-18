@@ -21,7 +21,6 @@ namespace HRSProject.Profile
         public string icon = "";
         protected void Page_Load(object sender, EventArgs e)
         {
-
             //txtPos.SelectedIndexChanged += new EventHandler(this.txtPos_SelectedIndexChanged);
             if (!string.IsNullOrEmpty(Request.Params["empID"]))
             {
@@ -36,16 +35,19 @@ namespace HRSProject.Profile
                     GroupProfile(false);
                 }
             }
-
-            if (!string.IsNullOrEmpty(Request.Params["ic"]))
-            {
-                txtIdcard.Text = Request.Params["ic"].ToString();
-            }
             else
             {
-                if (string.IsNullOrEmpty(Request.Params["empID"]))
+
+                if (!string.IsNullOrEmpty(Request.Params["ic"]))
                 {
-                    Response.Redirect("/Profile/empViwe");
+                    txtIdcard.Text = Request.Params["ic"].ToString();
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(Request.Params["empID"]))
+                    {
+                        Response.Redirect("/Profile/empViwe");
+                    }
                 }
             }
 
@@ -109,6 +111,7 @@ namespace HRSProject.Profile
                 }
             }
             dBScript.CloseConnection();
+
         }
 
         protected void reSet_Click(object sender, EventArgs e)
@@ -167,8 +170,8 @@ namespace HRSProject.Profile
                             imgUpload.SaveAs(Server.MapPath(NewFileName.ToString()));
                         }
 
-                        string sql_text = "emp_id,emp_profix_id,emp_name,emp_lname,emp_pos_id,emp_affi_id,emp_cpoint_id,emp_type_emp_id,emp_start_working,emp_birth_date,emp_weight,emp_height,emp_origin,emp_nationality,emp_religion,emp_id_card,emp_brethren_num,emp_brethren,emp_status,emp_add_idcard_num,emp_add_idcard_moo,emp_add_idcard_soi,emp_add_idcard_rd,emp_add_idcard_sub_dis,emp_add_idcard_dis,emp_add_idcard_province_id,emp_add_idcard_zipcode,emp_add_type,emp_add_num,emp_add_moo,emp_add_soi,emp_add_rd,emp_add_sub_dis,emp_add_dis,emp_add_province_id,emp_add_zipcode,emp_home_tel,emp_mobile_tel,emp_sso_blood_group,emp_sso_hospital,emp_book_bank_no,emp_img_profile,emp_staus_working";
-                        string sql_value = "'" + empId.Text + "','" + txtProfix.SelectedValue + "','" + txtName.Text + "','" + txtLname.Text + "','" + txtPos.SelectedValue + "','" + txtAffi.SelectedValue + "','" + txtCpoint.SelectedValue + "','" + txtEmpType.SelectedValue + "','" + txtDateStart.Text + "','" + txtBrithDate.Text + "','" + txtWeight.Text + "','" + txtHeight.Text + "','" + txtOrigin.Text + "','" + txtNationality.Text + "','" + txtReligion.Text + "','" + txtIdcard.Text + "','" + txtBrethren_num.Text + "','" + txtBrethren.Text + "','" + txtStatusRd.SelectedValue + "','" + txtIdcardAddNum.Text + "','" + txtIdcardMoo.Text + "','" + txtIdcardSoi.Text + "','" + txtIdcardRd.Text + "','" + txtIdcardSubDis.Text + "','" + txtIdcardDis.Text + "','" + txtProvince_idcard.SelectedValue + "','" + txtIdcardZipCode.Text + "','" + txtTypeAdd.SelectedValue + "','" + txtAddNum.Text + "','" + txtAddMoo.Text + "','" + txtAddSoi.Text + "','" + txtAddRd.Text + "','" + txtAddSubDis.Text + "','" + txtAddDis.Text + "','" + txtProvince.SelectedValue + "','" + txtAddZipcode.Text + "','" + txtPhone.Text + "','" + txtMobile.Text + "','" + txtBlood.SelectedItem + "','" + txtHospital.Text + "','" + txtBookBank.Text + "','" + NewFileName.ToString() + "','1'";
+                        string sql_text = "emp_id,emp_profix_id,emp_name,emp_lname,emp_pos_id,emp_affi_id,emp_cpoint_id,emp_type_emp_id,emp_start_working,emp_birth_date,emp_weight,emp_height,emp_origin,emp_nationality,emp_religion,emp_id_card,emp_brethren_num,emp_brethren,emp_status,emp_add_idcard_num,emp_add_idcard_moo,emp_add_idcard_soi,emp_add_idcard_rd,emp_add_idcard_sub_dis,emp_add_idcard_dis,emp_add_idcard_province_id,emp_add_idcard_zipcode,emp_add_type,emp_add_num,emp_add_moo,emp_add_soi,emp_add_rd,emp_add_sub_dis,emp_add_dis,emp_add_province_id,emp_add_zipcode,emp_home_tel,emp_mobile_tel,emp_sso_blood_group,emp_sso_hospital,emp_book_bank_no,emp_img_profile,emp_staus_working,emp_pos_num";
+                        string sql_value = "'" + empId.Text + "','" + txtProfix.SelectedValue + "','" + txtName.Text + "','" + txtLname.Text + "','" + txtPos.SelectedValue + "','" + txtAffi.SelectedValue + "','" + txtCpoint.SelectedValue + "','" + txtEmpType.SelectedValue + "','" + txtDateStart.Text + "','" + txtBrithDate.Text + "','" + txtWeight.Text + "','" + txtHeight.Text + "','" + txtOrigin.Text + "','" + txtNationality.Text + "','" + txtReligion.Text + "','" + txtIdcard.Text + "','" + txtBrethren_num.Text + "','" + txtBrethren.Text + "','" + txtStatusRd.SelectedValue + "','" + txtIdcardAddNum.Text + "','" + txtIdcardMoo.Text + "','" + txtIdcardSoi.Text + "','" + txtIdcardRd.Text + "','" + txtIdcardSubDis.Text + "','" + txtIdcardDis.Text + "','" + txtProvince_idcard.SelectedValue + "','" + txtIdcardZipCode.Text + "','" + txtTypeAdd.SelectedValue + "','" + txtAddNum.Text + "','" + txtAddMoo.Text + "','" + txtAddSoi.Text + "','" + txtAddRd.Text + "','" + txtAddSubDis.Text + "','" + txtAddDis.Text + "','" + txtProvince.SelectedValue + "','" + txtAddZipcode.Text + "','" + txtPhone.Text + "','" + txtMobile.Text + "','" + txtBlood.SelectedItem + "','" + txtHospital.Text + "','" + txtBookBank.Text + "','" + NewFileName.ToString() + "','1','"+ txtPosNum.Text.Trim() + "'";
                         string sql = "INSERT INTO tbl_emp_profile (" + sql_text + ") VALUES (" + sql_value + ")";
 
                         if (dBScript.actionSql(sql))
@@ -213,6 +216,7 @@ namespace HRSProject.Profile
                     sql_value += "emp_name='" + txtName.Text + "',";
                     sql_value += "emp_lname='" + txtLname.Text + "',";
                     sql_value += "emp_pos_id='" + txtPos.SelectedValue + "',";
+                    sql_value += "emp_pos_num='" + txtPosNum.Text.Trim() + "',";
                     sql_value += "emp_affi_id='" + txtAffi.SelectedValue + "',";
                     sql_value += "emp_cpoint_id='" + txtCpoint.SelectedValue + "',";
                     sql_value += "emp_type_emp_id='" + txtEmpType.SelectedValue + "',";
@@ -280,6 +284,7 @@ namespace HRSProject.Profile
                 txtName.Text = result.GetString("emp_name");
                 txtLname.Text = result.GetString("emp_lname");
                 txtPos.SelectedValue = result.GetString("emp_pos_id");
+                if (!result.IsDBNull(6)) { txtPosNum.Text = result.GetString("emp_pos_num"); }
                 txtAffi.SelectedValue = result.GetString("emp_affi_id");
                 txtCpoint.SelectedValue = result.GetString("emp_cpoint_id");
                 txtEmpType.SelectedValue = result.GetString("emp_type_emp_id");
@@ -358,7 +363,7 @@ namespace HRSProject.Profile
             getSeclctEmpExp();
             getSeclctEmpExpMoterway();
 
-            string sqlSelectGuarantor = "SELECT * FROM tbl_guarantor WHERE guarantor_emp_id = '" + empId.Text + "'";
+            string sqlSelectGuarantor = "SELECT * FROM tbl_guarantor WHERE guarantor_emp_id = '" + empId.Text + "' ORDER BY guarantor_id DESC";
             result = dBScript.selectSQL(sqlSelectGuarantor);
             if (result.Read())
             {
@@ -370,7 +375,7 @@ namespace HRSProject.Profile
             }
             result.Close();
 
-            string sqlSelectEcon = "SELECT * FROM tbl_emergency_contact WHERE emergency_contact_emp_id = '" + empId.Text + "'";
+            string sqlSelectEcon = "SELECT * FROM tbl_emergency_contact WHERE emergency_contact_emp_id = '" + empId.Text + "' ORDER BY emergency_contact_id DESC";
             result = dBScript.selectSQL(sqlSelectEcon);
             if (result.Read())
             {
@@ -1576,6 +1581,7 @@ namespace HRSProject.Profile
             txtName.Enabled = status;
             txtLname.Enabled = status;
             txtPos.Enabled = status;
+            txtPosNum.Enabled = status;
             txtAffi.Enabled = status;
             txtCpoint.Enabled = status;
             txtEmpType.Enabled = status;
@@ -1596,7 +1602,7 @@ namespace HRSProject.Profile
             DivExpMotoway.Visible = status;
             DivExpCpoint.Visible = status;
             DivStatus.Visible = status;
-            GroupHideGridview(EduGridView,5,status);
+            GroupHideGridview(EduGridView, 5, status);
             GroupHideGridview(ExpMoterwayGridView, 2, status);
             GroupHideGridview(ExpMoterwayGridView, 3, status);
             GroupHideGridview(DocGridView, 2, status);
@@ -1606,7 +1612,7 @@ namespace HRSProject.Profile
             GroupHideGridview(InOutHistoryGridView, 4, status);
         }
 
-        private void GroupHideGridview(GridView grid,int columns,bool status)
+        private void GroupHideGridview(GridView grid, int columns, bool status)
         {
             grid.Columns[columns].Visible = status;
         }

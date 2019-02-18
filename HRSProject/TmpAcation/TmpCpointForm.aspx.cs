@@ -19,6 +19,12 @@ namespace HRSProject.TmpAcation
         public string icon = "";
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Session["User"] == null)
+            {
+                Response.Redirect("/");
+            }
+
+            txtEmp_id.Enabled = false;
             if (!this.IsPostBack)
             {
                 string sql = "SELECT emp_id,CONCAT(emp_name,' ',emp_lname) AS emp_name FROM tbl_emp_profile ep where emp_staus_working = '1' ORDER BY emp_name";
@@ -29,10 +35,12 @@ namespace HRSProject.TmpAcation
 
                 string sql_cpoint = "SELECT * FROM tbl_cpoint";
                 dBScript.GetDownList(txtCpoint, sql_cpoint, "cpoint_name", "cpoint_id");
+
+                btnSave.Visible = false;
             }
             if (Session["User"] != null)
             {
-                if (dBScript.Notallow(new string[] { "5","4","3" }, Session["UserPrivilegeId"].ToString()))
+                if (dBScript.Notallow(new string[] { "5", "4", "3" }, Session["UserPrivilegeId"].ToString()))
                 {
                     Response.Redirect("/");
                 }
@@ -47,7 +55,7 @@ namespace HRSProject.TmpAcation
             {
                 if (txtDateSchedule.Text.Length == 10)
                 {
-                    string sql = "INSERT INTO tbl_tmp_cpoint ( tmp_cpoint_emp_id, tmp_cpoint_cpoint_id, tmp_cpoint_date, tmp_cpoint_status,tmp_cpoint_emp_pos,tmp_cpoint_emp_aff,tmp_cpoint_cpoint_old_id ) VALUES ( '" + txtEmp.SelectedValue+"', '"+txtCpoint.SelectedValue+"', '"+txtDateSchedule.Text.Trim()+"', '0','"+dBScript.getEmpData("emp_pos_id", txtEmp.SelectedValue) + "','" + dBScript.getEmpData("emp_affi_id", txtEmp.SelectedValue) + "','" + dBScript.getEmpData("emp_cpoint_id", txtEmp.SelectedValue) + "' )";
+                    string sql = "INSERT INTO tbl_tmp_cpoint ( tmp_cpoint_emp_id, tmp_cpoint_cpoint_id, tmp_cpoint_date, tmp_cpoint_status,tmp_cpoint_emp_pos,tmp_cpoint_emp_aff,tmp_cpoint_cpoint_old_id ) VALUES ( '" + txtEmp.SelectedValue + "', '" + txtCpoint.SelectedValue + "', '" + txtDateSchedule.Text.Trim() + "', '0','" + dBScript.getEmpData("emp_pos_id", txtEmp.SelectedValue) + "','" + dBScript.getEmpData("emp_affi_id", txtEmp.SelectedValue) + "','" + dBScript.getEmpData("emp_cpoint_id", txtEmp.SelectedValue) + "' )";
                     if (dBScript.actionSql(sql))
                     {
                         icon = "add_alert";
@@ -104,10 +112,21 @@ namespace HRSProject.TmpAcation
 
             }
 
-            Button btnEdit = (Button)(e.Row.FindControl("btnEdit"));
-            if (btnEdit != null)
+            LinkButton btnConfirm = (LinkButton)(e.Row.FindControl("btnConfirm"));
+            Label txtConfirm = (Label)(e.Row.FindControl("txtConfirm"));
+            if (btnConfirm != null)
             {
-                btnEdit.CommandArgument = (string)DataBinder.Eval(e.Row.DataItem, "tmp_cpoint_id");
+                btnConfirm.CommandName = DataBinder.Eval(e.Row.DataItem, "tmp_cpoint_id").ToString();
+                if (DataBinder.Eval(e.Row.DataItem, "tmp_cpoint_status_approve").ToString() == "0")
+                {
+                    btnConfirm.Visible = true;
+                    txtConfirm.Visible = false;
+                }
+                else
+                {
+                    btnConfirm.Visible = false;
+                    txtConfirm.Visible = true;
+                }
             }
 
             if (e.Row.RowType == DataControlRowType.DataRow)
@@ -151,7 +170,7 @@ namespace HRSProject.TmpAcation
 
         void BindData()
         {
-            string sql = "SELECT tmp_cpoint_id, profix_name, tmp_cpoint_emp_id, ep.emp_name, ep.emp_lname, cp.tmp_cpoint_date, c.cpoint_name, co.cpoint_name AS cpoint_name2 FROM tbl_tmp_cpoint cp JOIN tbl_emp_profile ep ON cp.tmp_cpoint_emp_id = ep.emp_id JOIN tbl_profix px ON px.profix_id = ep.emp_profix_id JOIN tbl_cpoint c ON c.cpoint_id = cp.tmp_cpoint_cpoint_id JOIN tbl_cpoint co ON co.cpoint_id = ep.emp_cpoint_id WHERE cp.tmp_cpoint_status = 0";
+            string sql = "SELECT tmp_cpoint_id, profix_name, tmp_cpoint_emp_id, ep.emp_name, ep.emp_lname, cp.tmp_cpoint_date, c.cpoint_name, co.cpoint_name AS cpoint_name2,tmp_cpoint_status_approve FROM tbl_tmp_cpoint cp JOIN tbl_emp_profile ep ON cp.tmp_cpoint_emp_id = ep.emp_id JOIN tbl_profix px ON px.profix_id = ep.emp_profix_id JOIN tbl_cpoint c ON c.cpoint_id = cp.tmp_cpoint_cpoint_id JOIN tbl_cpoint co ON co.cpoint_id = ep.emp_cpoint_id WHERE cp.tmp_cpoint_status = 0 ORDER BY STR_TO_DATE(tmp_cpoint_date, '%d-%m-%Y')";
             MySqlDataAdapter da = dBScript.getDataSelect(sql);
             DataSet ds = new DataSet();
             da.Fill(ds);
@@ -162,7 +181,7 @@ namespace HRSProject.TmpAcation
 
         void BindDataHis()
         {
-            string sql = "SELECT tmp_cpoint_id, profix_name, tmp_cpoint_emp_id, ep.emp_name, ep.emp_lname, cp.tmp_cpoint_date, c.cpoint_name, co.cpoint_name AS cpoint_name2 FROM tbl_tmp_cpoint cp JOIN tbl_emp_profile ep ON cp.tmp_cpoint_emp_id = ep.emp_id JOIN tbl_profix px ON px.profix_id = ep.emp_profix_id JOIN tbl_cpoint c ON c.cpoint_id = cp.tmp_cpoint_cpoint_id JOIN tbl_cpoint co ON co.cpoint_id = cp.tmp_cpoint_cpoint_old_id WHERE cp.tmp_cpoint_status = 1";
+            string sql = "SELECT tmp_cpoint_id, profix_name, tmp_cpoint_emp_id, ep.emp_name, ep.emp_lname, cp.tmp_cpoint_date, c.cpoint_name, co.cpoint_name AS cpoint_name2 FROM tbl_tmp_cpoint cp JOIN tbl_emp_profile ep ON cp.tmp_cpoint_emp_id = ep.emp_id JOIN tbl_profix px ON px.profix_id = ep.emp_profix_id JOIN tbl_cpoint c ON c.cpoint_id = cp.tmp_cpoint_cpoint_id JOIN tbl_cpoint co ON co.cpoint_id = cp.tmp_cpoint_cpoint_old_id WHERE cp.tmp_cpoint_status = 1 ORDER BY STR_TO_DATE(tmp_cpoint_date, '%d-%m-%Y') DESC LIMIT 0, 30 ";
             MySqlDataAdapter da = dBScript.getDataSelect(sql);
             DataSet ds = new DataSet();
             da.Fill(ds);
@@ -176,6 +195,44 @@ namespace HRSProject.TmpAcation
             txtEmp.SelectedIndex = 0;
             txtCpoint.SelectedIndex = 0;
             txtDateSchedule.Text = "";
+        }
+
+        protected void btnCheckEmp_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                txtEmp_id.Text = txtEmp.SelectedValue.ToString();
+                lbCpoint.Text = dBScript.getEmpData("cpoint_name", txtEmp_id.Text);
+                lbPos.Text = dBScript.getEmpData("pos_name", txtEmp_id.Text);
+                if (txtEmp_id.Text != "")
+                {
+                    btnSave.Visible = true;
+                }
+                else
+                {
+                    btnSave.Visible = false;
+                }
+            }
+            catch { }
+        }
+
+        protected void btnConfirm_Command(object sender, CommandEventArgs e)
+        {
+            string sql = "UPDATE tbl_tmp_cpoint SET tmp_cpoint_status_approve = 1 WHERE tmp_cpoint_id = '" + e.CommandName.ToString() + "'";
+            if (dBScript.actionSql(sql))
+            {
+                icon = "add_alert";
+                alertType = "success";
+                alert = "อนุมัติการย้ายด่านฯ สำเร็จ";
+                ClearData();
+            }
+            else
+            {
+                icon = "error";
+                alertType = "danger";
+                alert = "Error : อนุมัติการย้ายด่านฯ ล้มเหลว!!<br/>";
+            }
+            BindData();
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.Shared;
+using HRSProject.Guest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +16,13 @@ namespace HRSProject.Report
         {
             if (!this.IsPostBack)
             {
+                
+
                 if (Session["ReportTitle"] != null)
                 {
                     Title = Session["ReportTitle"].ToString();
-                    resultReportLeave.ReportSource = Session["Report"];
+                    //resultReportLeave.ParameterFieldInfo = (ParameterFields)Session["para"];
+                    resultReportLeave.ReportSource = ShowReport();
                     resultReportLeave.Visible = true;
                 }
                 else
@@ -25,6 +30,22 @@ namespace HRSProject.Report
                     Response.Redirect("/");
                 }
             }
+        }
+
+        public ReportDocument ShowReport()
+        {
+            ReportDocument cryRpt = (ReportDocument)Session["Report"];
+            try
+            {
+                //cryRpt.SetDatabaseLogon("adminhrs", "admin25", "MySql DSN HR", "hrsystem");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+                //ShowReport(@"default_report.rpt");
+            }
+            //CleareParameter();
+            return cryRpt;
         }
     }
 }

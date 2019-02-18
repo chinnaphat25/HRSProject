@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="TmpExForm.aspx.cs" Inherits="HRSProject.TmpAcation.TmpExForm" %>
+﻿<%@ Page Title="พนักงานที่ลาออก" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="TmpExForm.aspx.cs" Inherits="HRSProject.TmpAcation.TmpExForm" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
 
@@ -17,37 +17,60 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-2 text-right">
+                    <asp:Label ID="Label5" runat="server" Text="รหัสบุคคล : "></asp:Label>
+                </div>
+                <div class="col-2">
+                    <asp:TextBox ID="txtEmp_id" runat="server" CssClass="form-control"></asp:TextBox>
+                </div>
+                <div class="col-1 text-right">
                     <asp:Label ID="Label1" runat="server" Text="ชื่อ-สกุล : "></asp:Label>
                 </div>
                 <div class="col-3">
                     <asp:DropDownList ID="txtEmp" runat="server" CssClass="combobox form-control"></asp:DropDownList>
                 </div>
+                <div class="col-1 text-right">
+                    <asp:LinkButton ID="btnCheckEmp" Text="ตรวจสอบ" CssClass="btn btn-info btn-sm" Font-Size="Medium" OnClick="btnCheckEmp_Click" runat="server" />
+                </div>
+            </div><br />
+            <div class="row">
                 <div class="col-2 text-right">
-                    <asp:Label ID="Label2" runat="server" Text="วันที่มีผล : "></asp:Label>
+                    <asp:Label ID="Label6" runat="server" Text="ด่านฯ : "></asp:Label>
+                </div>
+                <div class="col-2">
+                    <asp:Label ID="lbCpoint" runat="server" Text=""></asp:Label>
+                </div>
+                <div class="col-1 text-right">
+                    <asp:Label ID="Label7" runat="server" Text="ตำแหน่ง : "></asp:Label>
                 </div>
                 <div class="col-3">
-                    <asp:TextBox ID="txtDateSchedule" runat="server" CssClass="form-control datepicker"></asp:TextBox>
+                    <asp:Label ID="lbPos" runat="server" Text=""></asp:Label>
                 </div>
             </div>
             <br />
             <div class="row">
                 <div class="col-2 text-right">
+                    <asp:Label ID="Label2" runat="server" Text="วันที่มีผล : "></asp:Label>
+                </div>
+                <div class="col-2">
+                    <asp:TextBox ID="txtDateSchedule" runat="server" CssClass="form-control datepicker"></asp:TextBox>
+                </div>
+                <div class="col-1 text-right">
                     <asp:Label ID="Label4" runat="server" Text="สถานภาพ : "></asp:Label>
                 </div>
                 <div class="col-2">
                     <asp:DropDownList ID="txtWorkingStatus" runat="server" CssClass="form-control"></asp:DropDownList>
                 </div>
-                <div class="col-3 text-right">
+                <div class="col-1 text-right">
                     <asp:Label ID="Label3" runat="server" Text="เนื่องจาก : "></asp:Label>
                 </div>
-                <div class="col-3">
+                <div class="col-2">
                     <asp:TextBox ID="txtNote" runat="server" CssClass="form-control"></asp:TextBox>
                 </div>
             </div>
             <br />
             <div class="row text-center">
                 <div class="col">
-                    <asp:Button ID="btnSave" runat="server" Text="บันทึก" CssClass="btn btn-success" OnClick="btnSave_Click" />
+                    <asp:Button ID="btnSave" runat="server" Text="บันทึก" CssClass="btn btn-success" OnClick="btnSave_Click" OnClientClick="return CompareConfirm('ยืนยันบันทึกการลาออก ใช่หรือไม่');" />
                 </div>
             </div>
         </div>
@@ -87,7 +110,7 @@
                                 <asp:Label ID="lbWorkingStatus" runat="server"></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderText="เนื่องจาก" ItemStyle-Width="80px">
+                        <asp:TemplateField HeaderText="เนื่องจาก" ItemStyle-Width="250px">
                             <ItemTemplate>
                                 <asp:Label ID="lbNote" runat="server" Text='<%# DataBinder.Eval(Container, "DataItem.tmp_ex_note") %>'></asp:Label>
                             </ItemTemplate>
@@ -100,6 +123,12 @@
                         <asp:TemplateField HeaderText="เหลืออีก/วัน">
                             <ItemTemplate>
                                 <asp:Label ID="lbCountdown" runat="server"></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="อนุมัติ/ยืนยันการลาออก">
+                            <ItemTemplate>
+                                <asp:LinkButton ID="btnConfirm" runat="server" CssClass="btn btn-outline-warning btn-sm fa" Font-Size="Small" OnCommand="btnConfirm_Command" OnClientClick="return CompareConfirm('ยืนยันอนุมัติการลาออก ใช่หรือไม่');">&#xf046; อนุมัติ</asp:LinkButton>
+                                <asp:Label ID="txtConfirm" runat="server" CssClass="badge badge-success" Text="อนุมัติแล้ว"></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
                         <asp:CommandField ShowDeleteButton="True" HeaderText="ลบ" DeleteText="&#xf014; ลบ" ControlStyle-CssClass="btn btn-outline-danger btn-sm fa" ControlStyle-Font-Size="Small" />
@@ -126,6 +155,7 @@
                     OnRowDataBound="HisTmpExGridViewGridView_RowDataBound"
                     AutoGenerateColumns="False"
                     HeaderStyle-CssClass="thead-light"
+                    PageSize="50"
                     Font-Size="19px">
                     <Columns>
                         <asp:TemplateField HeaderText="รหัสบุคคล" ItemStyle-Width="80px">
@@ -143,19 +173,14 @@
                                 <asp:Label ID="lbWorkingStatus" runat="server"></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderText="เนื่องจาก" ItemStyle-Width="80px">
+                        <asp:TemplateField HeaderText="เนื่องจาก" ItemStyle-Width="350px">
                             <ItemTemplate>
                                 <asp:Label ID="lbNote" runat="server" Text='<%# DataBinder.Eval(Container, "DataItem.tmp_ex_note") %>'></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderText="วันที่มีผล">
+                        <asp:TemplateField HeaderText="วันที่ลาออก">
                             <ItemTemplate>
                                 <asp:Label ID="lbempChengDate" runat="server"></asp:Label>
-                            </ItemTemplate>
-                        </asp:TemplateField>
-                        <asp:TemplateField HeaderText="ลาออกไปแล้ว/วัน">
-                            <ItemTemplate>
-                                <asp:Label ID="lbCountdown" runat="server"></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
                     </Columns>
@@ -169,4 +194,18 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+        function CompareConfirm(msg) {
+            var str1 = "1";
+            var str2 = "2";
+
+            if (str1 === str2) {
+                // your logic here
+                return false;
+            } else {
+                // your logic here
+                return confirm(msg);
+            }
+        }
+    </script>
 </asp:Content>

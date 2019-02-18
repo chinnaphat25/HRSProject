@@ -19,6 +19,7 @@ namespace HRSProject.LeaveEmp
         Leave leaveUser; 
         protected void Page_Load(object sender, EventArgs e)
         {
+
             if (!string.IsNullOrEmpty(Request.Params["empID"]))
             {
                 if (dBScript.CheckPrivilege(Session["UserPrivilegeId"].ToString(), "Assistant"))
@@ -36,18 +37,18 @@ namespace HRSProject.LeaveEmp
                     MySqlDataReader rs = dBScript.selectSQL(sql);
                     if (rs.Read())
                     {
-                        leave = new Leave(rs.GetString("exp_moterway_start"));
+                        leave = new Leave(rs.GetString("exp_moterway_start"),true);
                     }
                     else
                     {
-                        leave = new Leave(DateTime.Now.ToString("dd-MM-") + (DateTime.Now.Year + 543));
+                        leave = new Leave(DateTime.Now.ToString("dd-MM-") + (DateTime.Now.Year + 543),true);
                     }
                     rs.Close();
                     dBScript.CloseConnection();
                 }
                 else
                 {
-                    leave = new Leave(dBScript.getEmpIDMD5("emp_start_working", Request.Params["empID"]));
+                    leave = new Leave(dBScript.getEmpIDMD5("emp_start_working", Request.Params["empID"]),false);
                 }
                 //empId.Text = Request.Params["empID"].ToString().Trim();pos_name
                 leaveUser = new Leave(dBScript.getEmpIDMD5("emp_id", Request.Params["empID"]), int.Parse(dBScript.getBudgetYear()));

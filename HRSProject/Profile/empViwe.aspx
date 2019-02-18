@@ -1,4 +1,4 @@
-﻿<%@ Page Title="ประวัติพนักงาน" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="empViwe.aspx.cs" Inherits="HRSProject.Profile.empViwe" %>
+﻿<%@ Page Title="ประวัติพนักงาน" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="empViwe.aspx.cs" Inherits="HRSProject.Profile.empViwe" EnableEventValidation="false" %>
 
 <%@ Register Assembly="CrystalDecisions.Web, Version=13.0.3500.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" Namespace="CrystalDecisions.Web" TagPrefix="CR" %>
 
@@ -11,18 +11,19 @@
         });
     </script>
     <% } %>
-    <div class="form-row">
+    <div class="form-row" id="DivAdd" runat="server">
         <div class="col-md">
             <asp:LinkButton ID="btnAddEmp" runat="server" Font-Size="Medium" CssClass="btn btn-success fa btn-sm" data-toggle="modal" data-target="#ModalCheckEmp" OnClientClick="return false;" Text="&#xf067; เพิ่มพนักงานใหม่" />
-            <asp:LinkButton ID="btnUpdateEmp" runat="server" Text="&#xf067; พนักงานเดิม(สมัครใหม่)" Font-Size="Medium" CssClass="btn btn-info fa btn-sm" data-toggle="modal" data-target="#ModalOldEmp" OnClientClick="return false;" />
+            <!--<asp:LinkButton ID="btnUpdateEmp" runat="server" Text="&#xf067; พนักงานเดิม(สมัครใหม่)" Font-Size="Medium" CssClass="btn btn-info fa btn-sm" data-toggle="modal" data-target="#ModalOldEmp" OnClientClick="return false;" />-->
             <asp:LinkButton ID="btnShEmp" runat="server" Text="ค้นหาประวัติ (เข้า/ออก)" Font-Size="Medium" CssClass="btn btn-warning fa btn-sm" OnClick="btnShEmp_Click" />
+            <asp:LinkButton ID="btnPrintListName" runat="server" Text="พิมพ์รายชื่อ" Font-Size="Medium" CssClass="btn btn-dark fa btn-sm" OnClick="btnPrintListName_Click" />
         </div>
         <div class="col-md">
         </div>
     </div>
     <asp:UpdatePanel runat="server">
         <ContentTemplate>
-            <div class="card" style="z-index: 0;">
+            <div class="card" style="z-index: 0;" id="DivSearch" runat="server">
                 <div class="card-header card-header-warning">
                     <h4 class="card-title ">ค้นหา</h4>
                 </div>
@@ -37,13 +38,13 @@
                         <div class="col-md-3">
                             <asp:TextBox ID="txtSearchName" runat="server" CssClass="form-control" placeholder="ชื่อ-สกุล"></asp:TextBox>
                         </div>
-                    </div>
-                    <br />
-                    <div class="row">
                         <div class="col-md-1 text-right">ด่านฯ : </div>
                         <div class="col-md-2">
                             <asp:DropDownList ID="txtSearchCpoint" runat="server" CssClass="form-control"></asp:DropDownList>
                         </div>
+                    </div>
+                    <br />
+                    <div class="row">
                         <div class="col-md-1 text-right">ตำแหน่ง : </div>
                         <div class="col-md-3">
                             <asp:DropDownList ID="txtSearchPos" runat="server" CssClass="form-control"></asp:DropDownList>
@@ -51,6 +52,10 @@
                         <div class="col-md-1 text-right">หน่วย : </div>
                         <div class="col-md-2">
                             <asp:DropDownList ID="txtSearchAffi" runat="server" CssClass="form-control"></asp:DropDownList>
+                        </div>
+                        <div class="col-md-1 text-right">ประเภท : </div>
+                        <div class="col-md-2">
+                            <asp:DropDownList ID="txtSearchType" runat="server" CssClass="form-control"></asp:DropDownList>
                         </div>
                     </div>
                     <br />
@@ -225,7 +230,7 @@
         $(function () {
             $(".datepicker").datepicker($.datepicker.regional["th"]);
             $("#<%=txtStartDate.ClientID.ToString()%>").datepicker($.datepicker.regional["th"]);
-                $("#<%=txtStartDate.ClientID.ToString()%>").datepicker("setDate", new Date());
+            $("#<%=txtStartDate.ClientID.ToString()%>").datepicker("setDate", new Date());
         });
     </script>
 </asp:Content>

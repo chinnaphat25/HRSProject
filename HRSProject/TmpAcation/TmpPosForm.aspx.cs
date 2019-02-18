@@ -19,6 +19,12 @@ namespace HRSProject.TmpAcation
         public string icon = "";
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (Session["User"] == null)
+            {
+                Response.Redirect("/");
+            }
+
+            txtEmp_id.Enabled = false;
             if (!this.IsPostBack)
             {
                 string sql = "SELECT emp_id,CONCAT(emp_name,' ',emp_lname) AS emp_name FROM tbl_emp_profile ep where emp_staus_working = '1' ORDER BY emp_name";
@@ -35,6 +41,8 @@ namespace HRSProject.TmpAcation
 
                 string sql_empType = "SELECT * FROM tbl_type_emp";
                 dBScript.GetDownList(txtEmpType, sql_empType, "type_emp_name", "type_emp_id");
+
+                btnSave.Visible = false;
             }
             if (Session["User"] != null)
             {
@@ -110,10 +118,21 @@ namespace HRSProject.TmpAcation
 
             }
 
-            Button btnEdit = (Button)(e.Row.FindControl("btnEdit"));
-            if (btnEdit != null)
+            LinkButton btnConfirm = (LinkButton)(e.Row.FindControl("btnConfirm"));
+            Label txtConfirm = (Label)(e.Row.FindControl("txtConfirm"));
+            if (btnConfirm != null)
             {
-                btnEdit.CommandArgument = (string)DataBinder.Eval(e.Row.DataItem, "tmp_pos_id");
+                btnConfirm.CommandName = DataBinder.Eval(e.Row.DataItem, "tmp_pos_id").ToString();
+                if (DataBinder.Eval(e.Row.DataItem, "tmp_pos_status_approve").ToString() == "0")
+                {
+                    btnConfirm.Visible = true;
+                    txtConfirm.Visible = false;
+                }
+                else
+                {
+                    btnConfirm.Visible = false;
+                    txtConfirm.Visible = true;
+                }
             }
 
             if (e.Row.RowType == DataControlRowType.DataRow)
@@ -157,7 +176,7 @@ namespace HRSProject.TmpAcation
 
         void BindData()
         {
-            string sql = "SELECT tmp_pos_id, profix_name, tmp_pos_emp_id, ep.emp_name, ep.emp_lname, tp.tmp_pos_date, CONCAT(p.pos_name, ' / ', ta.affi_name,' / ',te.type_emp_name) AS pos_name, CONCAT(po.pos_name, ' / ', taf.affi_name,' / ',tem.type_emp_name) AS pos_name2 FROM tbl_tmp_pos tp JOIN tbl_emp_profile ep ON tp.tmp_pos_emp_id = ep.emp_id JOIN tbl_profix px ON px.profix_id = ep.emp_profix_id JOIN tbl_pos p ON p.pos_id = tp.tmp_pos_pos_id JOIN tbl_pos po ON po.pos_id = tp.tmp_pos_pos_old_id JOIN tbl_affiliation ta ON ta.affi_id = tp.tmp_pos_aff_id JOIN tbl_affiliation taf ON taf.affi_id = tp.tmp_pos_aff_old_id JOIN tbl_type_emp te ON te.type_emp_id = tp.tmp_pos_emp_type_id JOIN tbl_type_emp tem ON tp.tmp_pos_emp_type_old_id = tem.type_emp_id WHERE tp.tmp_pos_status = 0";
+            string sql = "SELECT tmp_pos_id, profix_name, tmp_pos_emp_id, ep.emp_name, ep.emp_lname, tp.tmp_pos_date, CONCAT(p.pos_name, ' / ', ta.affi_name,' / ',te.type_emp_name) AS pos_name, CONCAT(po.pos_name, ' / ', taf.affi_name,' / ',tem.type_emp_name) AS pos_name2,tmp_pos_status_approve FROM tbl_tmp_pos tp JOIN tbl_emp_profile ep ON tp.tmp_pos_emp_id = ep.emp_id JOIN tbl_profix px ON px.profix_id = ep.emp_profix_id JOIN tbl_pos p ON p.pos_id = tp.tmp_pos_pos_id JOIN tbl_pos po ON po.pos_id = tp.tmp_pos_pos_old_id JOIN tbl_affiliation ta ON ta.affi_id = tp.tmp_pos_aff_id JOIN tbl_affiliation taf ON taf.affi_id = tp.tmp_pos_aff_old_id JOIN tbl_type_emp te ON te.type_emp_id = tp.tmp_pos_emp_type_id JOIN tbl_type_emp tem ON tp.tmp_pos_emp_type_old_id = tem.type_emp_id WHERE tp.tmp_pos_status = 0 ORDER BY STR_TO_DATE(tmp_pos_date,'%d-%m-%Y')";
             MySqlDataAdapter da = dBScript.getDataSelect(sql);
             DataSet ds = new DataSet();
             da.Fill(ds);
@@ -168,7 +187,7 @@ namespace HRSProject.TmpAcation
 
         void BindDataHis()
         {
-            string sql = "SELECT tmp_pos_id, profix_name, tmp_pos_emp_id, ep.emp_name, ep.emp_lname, tp.tmp_pos_date, CONCAT(p.pos_name, ' / ', ta.affi_name,' / ',te.type_emp_name) AS pos_name, CONCAT(po.pos_name, ' / ', taf.affi_name,' / ',tem.type_emp_name) AS pos_name2 FROM tbl_tmp_pos tp JOIN tbl_emp_profile ep ON tp.tmp_pos_emp_id = ep.emp_id JOIN tbl_profix px ON px.profix_id = ep.emp_profix_id JOIN tbl_pos p ON p.pos_id = tp.tmp_pos_pos_id JOIN tbl_pos po ON po.pos_id = tp.tmp_pos_pos_old_id JOIN tbl_affiliation ta ON ta.affi_id = tp.tmp_pos_aff_id JOIN tbl_affiliation taf ON taf.affi_id = tp.tmp_pos_aff_old_id JOIN tbl_type_emp te ON te.type_emp_id = tp.tmp_pos_emp_type_id JOIN tbl_type_emp tem ON tp.tmp_pos_emp_type_old_id = tem.type_emp_id WHERE tp.tmp_pos_status = 1 LIMIT 0, 20";
+            string sql = "SELECT tmp_pos_id, profix_name, tmp_pos_emp_id, ep.emp_name, ep.emp_lname, tp.tmp_pos_date, CONCAT(p.pos_name, ' / ', ta.affi_name,' / ',te.type_emp_name) AS pos_name, CONCAT(po.pos_name, ' / ', taf.affi_name,' / ',tem.type_emp_name) AS pos_name2 FROM tbl_tmp_pos tp JOIN tbl_emp_profile ep ON tp.tmp_pos_emp_id = ep.emp_id JOIN tbl_profix px ON px.profix_id = ep.emp_profix_id JOIN tbl_pos p ON p.pos_id = tp.tmp_pos_pos_id JOIN tbl_pos po ON po.pos_id = tp.tmp_pos_pos_old_id JOIN tbl_affiliation ta ON ta.affi_id = tp.tmp_pos_aff_id JOIN tbl_affiliation taf ON taf.affi_id = tp.tmp_pos_aff_old_id JOIN tbl_type_emp te ON te.type_emp_id = tp.tmp_pos_emp_type_id JOIN tbl_type_emp tem ON tp.tmp_pos_emp_type_old_id = tem.type_emp_id WHERE tp.tmp_pos_status = 1 ORDER BY STR_TO_DATE(tmp_pos_date,'%d-%m-%Y'),tmp_pos_id DESC LIMIT 0,30";
             MySqlDataAdapter da = dBScript.getDataSelect(sql);
             DataSet ds = new DataSet();
             da.Fill(ds);
@@ -185,5 +204,42 @@ namespace HRSProject.TmpAcation
             txtDateSchedule.Text = "";
         }
 
+        protected void btnCheckEmp_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                txtEmp_id.Text = txtEmp.SelectedValue.ToString();
+                lbCpoint.Text = dBScript.getEmpData("cpoint_name", txtEmp_id.Text);
+                lbPos.Text = dBScript.getEmpData("pos_name", txtEmp_id.Text);
+                if (txtEmp_id.Text != "")
+                {
+                    btnSave.Visible = true;
+                }
+                else
+                {
+                    btnSave.Visible = false;
+                }
+            }
+            catch { }
+        }
+
+        protected void btnConfirm_Command(object sender, CommandEventArgs e)
+        {
+            string sql = "UPDATE tbl_tmp_pos SET tmp_pos_status_approve = 1 WHERE tmp_pos_id = '" + e.CommandName.ToString() + "'";
+            if (dBScript.actionSql(sql))
+            {
+                icon = "add_alert";
+                alertType = "success";
+                alert = "อนุมัติการปรับตำแหน่ง สำเร็จ";
+                ClearData();
+            }
+            else
+            {
+                icon = "error";
+                alertType = "danger";
+                alert = "Error : อนุมัติการปรับตำแหน่ง ล้มเหลว!!<br/>";
+            }
+            BindData();
+        }
     }
 }

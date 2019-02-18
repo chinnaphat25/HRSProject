@@ -24,13 +24,18 @@ namespace HRSProject
                 MySqlDataReader rs = dBScript.selectSQL(sql);
                 if (rs.Read())
                 {
-                    lbCountEmp.Text = "ทั้งหมด "+rs.GetString("EmpSum") +" คน";
+                    lbCountEmp.Text = "ทั้งหมด " + rs.GetString("EmpSum") + " คน";
                 }
                 rs.Close();
                 BindDataLeave();
+                BindRetire();
                 dBScript.CloseConnection();
 
+                string sql_guest = "SELECT guest_offer_date FROM  tbl_guest ORDER BY STR_TO_DATE(guest_offer_date, '%d-%m-%Y') DESC ";
+                LabelGuest.Text = "รายการล่าสุด "+dBScript.convertDateShortThai(dBScript.GetSelectData(sql_guest));
+
                 lbYear.Text = dBScript.getBudgetYear();
+                txtYear.Text = dBScript.getBudgetYear();
             }
             if (Session["User"] != null)
             {
@@ -39,7 +44,7 @@ namespace HRSProject
                     Response.Redirect("/Profile/empViwe");
                 }
 
-                if (dBScript.Notallow(new string[] { "5","4","3" }, Session["UserPrivilegeId"].ToString()))
+                if (dBScript.Notallow(new string[] { "5", "4", "3" }, Session["UserPrivilegeId"].ToString()))
                 {
                     boxChangPos.Visible = false;
                     boxMigrateEmp.Visible = false;
@@ -59,6 +64,20 @@ namespace HRSProject
             if (ds.Tables[0].Rows.Count <= 0)
             {
                 lbLeaveStatisticsNull.Text = "ไม่พบข้อมูลการลาของพนักงาน";
+            }
+        }
+
+        void BindRetire()
+        {
+            string sql = "SELECT emp_id, CONCAT(profix_name, emp_name,' ', emp_lname) AS name, cpoint_name, pos_name, type_emp_name FROM tbl_emp_profile JOIN tbl_profix ON profix_id = emp_profix_id JOIN tbl_cpoint ON cpoint_id = emp_cpoint_id JOIN tbl_pos ON pos_id = emp_pos_id JOIN tbl_type_emp ON type_emp_id = emp_type_emp_id WHERE DATE_FORMAT('" + (int.Parse(dBScript.getBudgetYear()) - 543) + "-10-31', '%Y') - DATE_FORMAT( DATE_ADD( STR_TO_DATE(emp_birth_date, '%d-%m-%Y'), INTERVAL - 543 YEAR ), '%Y' ) - ( DATE_FORMAT('" + (int.Parse(dBScript.getBudgetYear()) - 543) + "-10-31', '00-%m-%d') < DATE_FORMAT( DATE_ADD( STR_TO_DATE(emp_birth_date, '%d-%m-%Y'), INTERVAL - 543 YEAR ), '00-%m-%d' ) ) >= 60 AND emp_staus_working = 1";
+            MySqlDataAdapter da = dBScript.getDataSelect(sql);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            RetireGridView.DataSource = ds.Tables[0];
+            RetireGridView.DataBind();
+            if (ds.Tables[0].Rows.Count <= 0)
+            {
+                Label7.Text = "ไม่พบข้อมูลพนักงานที่จะเกษียณ";
             }
         }
 

@@ -19,16 +19,9 @@ namespace HRSProject.TmpAcation
         public string icon = "";
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!this.IsPostBack)
+            if (Session["User"] == null)
             {
-                string sql = "SELECT emp_id,CONCAT(emp_name,' ',emp_lname) AS emp_name FROM tbl_emp_profile ep where emp_staus_working = '1' ORDER BY emp_name";
-                dBScript.GetDownList(txtEmp, sql, "emp_name", "emp_id");
-                txtEmp.Items.Insert(0, new ListItem("", ""));
-                sql = "SELECT * FROM tbl_status_working WHERE status_working_id <> 1";
-                dBScript.GetDownList(txtWorkingStatus, sql, "status_working_name", "status_working_id");
-               
-                BindData();
-                BindDataHis();
+                Response.Redirect("/");
             }
             if (Session["User"] != null)
             {
@@ -37,6 +30,21 @@ namespace HRSProject.TmpAcation
                     Response.Redirect("/");
                 }
             }
+
+            txtEmp_id.Enabled = false;
+            if (!this.IsPostBack)
+            {
+                string sql = "SELECT emp_id,CONCAT(emp_name,' ',emp_lname) AS emp_name FROM tbl_emp_profile ep where emp_staus_working = '1' ORDER BY emp_name";
+                dBScript.GetDownList(txtEmp, sql, "emp_name", "emp_id");
+                txtEmp.Items.Insert(0, new ListItem("", ""));
+                sql = "SELECT * FROM tbl_status_working WHERE status_working_id <> 1";
+                dBScript.GetDownList(txtWorkingStatus, sql, "status_working_name", "status_working_id");
+
+                BindData();
+                BindDataHis();
+                btnSave.Visible = false;
+            }
+
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
@@ -47,7 +55,7 @@ namespace HRSProject.TmpAcation
             {
                 if (txtDateSchedule.Text.Length == 10)
                 {
-                    string sql = "INSERT INTO tbl_tmp_ex ( tmp_ex_emp, tmp_ex_status, tmp_ex_date, tmp_ex_note,tmp_ex_working_status ) VALUES ( '" + txtEmp.SelectedValue+"', '0', '"+txtDateSchedule.Text.Trim()+"', '"+txtNote.Text+"','"+txtWorkingStatus.SelectedValue+"' )";
+                    string sql = "INSERT INTO tbl_tmp_ex ( tmp_ex_emp, tmp_ex_status, tmp_ex_date, tmp_ex_note,tmp_ex_working_status ) VALUES ( '" + txtEmp.SelectedValue + "', '0', '" + txtDateSchedule.Text.Trim() + "', '" + txtNote.Text + "','" + txtWorkingStatus.SelectedValue + "' )";
                     if (dBScript.actionSql(sql))
                     {
                         icon = "add_alert";
@@ -103,17 +111,36 @@ namespace HRSProject.TmpAcation
             Label lbempAgeWork = (Label)(e.Row.FindControl("lbCountdown"));
             if (lbempAgeWork != null)
             {
-                string[] data = DataBinder.Eval(e.Row.DataItem, "tmp_ex_date").ToString().Split('-');
-                DateTime dateStart = DateTime.ParseExact(data[0] + "-" + data[1] + "-" + (int.Parse(data[2]) - 543), "dd-MM-yyyy", CultureInfo.InvariantCulture);
-                DateDifference dDiff = new DateDifference(dateStart);
-                lbempAgeWork.Text = dDiff.ToString();
+                if (DateTime.Now.Date > dBScript.DateCalculationK(DataBinder.Eval(e.Row.DataItem, "tmp_ex_date").ToString(),0))
+                {
+                    lbempAgeWork.Text = "เกินกำหนด";
+                    lbempAgeWork.CssClass = "text-danger";
+                }
+                else
+                {
+                    string[] data = DataBinder.Eval(e.Row.DataItem, "tmp_ex_date").ToString().Split('-');
+                    DateTime dateStart = DateTime.ParseExact(data[0] + "-" + data[1] + "-" + (int.Parse(data[2]) - 543), "dd-MM-yyyy", CultureInfo.InvariantCulture);
+                    DateDifference dDiff = new DateDifference(dateStart);
+                    lbempAgeWork.Text = dDiff.ToString();
+                }
 
             }
 
-            Button btnEdit = (Button)(e.Row.FindControl("btnEdit"));
-            if (btnEdit != null)
+            LinkButton btnConfirm = (LinkButton)(e.Row.FindControl("btnConfirm"));
+            Label txtConfirm = (Label)(e.Row.FindControl("txtConfirm"));
+            if (btnConfirm != null)
             {
-                btnEdit.CommandArgument = (string)DataBinder.Eval(e.Row.DataItem, "tmp_ex_id");
+                btnConfirm.CommandName = DataBinder.Eval(e.Row.DataItem, "tmp_ex_id").ToString();
+                if (DataBinder.Eval(e.Row.DataItem, "tmp_ex_status_approve").ToString() == "0")
+                {
+                    btnConfirm.Visible = true;
+                    txtConfirm.Visible = false;
+                }
+                else
+                {
+                    btnConfirm.Visible = false;
+                    txtConfirm.Visible = true;
+                }
             }
 
             if (e.Row.RowType == DataControlRowType.DataRow)
@@ -157,7 +184,7 @@ namespace HRSProject.TmpAcation
 
         void BindData()
         {
-            string sql = "SELECT * FROM tbl_tmp_ex ex JOIN tbl_emp_profile ep ON ep.emp_id = ex.tmp_ex_emp JOIN tbl_profix px ON px.profix_id = ep.emp_profix_id JOIN tbl_status_working sw ON ex.tmp_ex_working_status = sw.status_working_id WHERE tmp_ex_status = 0";
+            string sql = "SELECT * FROM tbl_tmp_ex ex JOIN tbl_emp_profile ep ON ep.emp_id = ex.tmp_ex_emp JOIN tbl_profix px ON px.profix_id = ep.emp_profix_id JOIN tbl_status_working sw ON ex.tmp_ex_working_status = sw.status_working_id WHERE tmp_ex_status = 0 ORDER BY STR_TO_DATE(ex.tmp_ex_date, '%d-%m-%Y')";
             MySqlDataAdapter da = dBScript.getDataSelect(sql);
             DataSet ds = new DataSet();
             da.Fill(ds);
@@ -168,7 +195,7 @@ namespace HRSProject.TmpAcation
 
         void BindDataHis()
         {
-            string sql = "SELECT * FROM tbl_tmp_ex ex LEFT JOIN tbl_emp_profile ep ON ep.emp_id = ex.tmp_ex_emp LEFT JOIN tbl_profix px ON px.profix_id = ep.emp_profix_id JOIN tbl_status_working sw ON ex.tmp_ex_working_status = sw.status_working_id WHERE tmp_ex_status = 1 LIMIT 0,20";
+            string sql = "SELECT * FROM tbl_tmp_ex ex LEFT JOIN tbl_emp_profile ep ON ep.emp_id = ex.tmp_ex_emp LEFT JOIN tbl_profix px ON px.profix_id = ep.emp_profix_id JOIN tbl_status_working sw ON ex.tmp_ex_working_status = sw.status_working_id WHERE tmp_ex_status = 1 ORDER BY STR_TO_DATE(ex.tmp_ex_date, '%d-%m-%Y') DESC LIMIT 0,40 ";
             MySqlDataAdapter da = dBScript.getDataSelect(sql);
             DataSet ds = new DataSet();
             da.Fill(ds);
@@ -189,7 +216,8 @@ namespace HRSProject.TmpAcation
             Label lbempName = (Label)(e.Row.FindControl("lbempName"));
             if (lbempName != null)
             {
-                if (!DataBinder.Eval(e.Row.DataItem, "profix_name").Equals(DBNull.Value)) {
+                if (!DataBinder.Eval(e.Row.DataItem, "profix_name").Equals(DBNull.Value))
+                {
                     lbempName.Text = (string)DataBinder.Eval(e.Row.DataItem, "profix_name") + (string)DataBinder.Eval(e.Row.DataItem, "emp_name") + "  " + (string)DataBinder.Eval(e.Row.DataItem, "emp_lname");
                 }
                 else
@@ -209,16 +237,44 @@ namespace HRSProject.TmpAcation
             {
                 lbempChengDate.Text = dBScript.convertDatelongThai((string)DataBinder.Eval(e.Row.DataItem, "tmp_ex_date"));
             }
+        }
 
-            Label lbempAgeWork = (Label)(e.Row.FindControl("lbCountdown"));
-            if (lbempAgeWork != null)
+        protected void btnCheckEmp_Click(object sender, EventArgs e)
+        {
+            try
             {
-                string[] data = DataBinder.Eval(e.Row.DataItem, "tmp_ex_date").ToString().Split('-');
-                DateTime dateStart = DateTime.ParseExact(data[0] + "-" + data[1] + "-" + (int.Parse(data[2]) - 543), "dd-MM-yyyy", CultureInfo.InvariantCulture);
-                DateDifference dDiff = new DateDifference(dateStart);
-                lbempAgeWork.Text = dDiff.ToStringNew();
-
+                txtEmp_id.Text = txtEmp.SelectedValue.ToString();
+                lbCpoint.Text = dBScript.getEmpData("cpoint_name", txtEmp_id.Text);
+                lbPos.Text = dBScript.getEmpData("pos_name", txtEmp_id.Text);
+                if (txtEmp_id.Text != "")
+                {
+                    btnSave.Visible = true;
+                }
+                else
+                {
+                    btnSave.Visible = false;
+                }
             }
+            catch { }
+        }
+
+        protected void btnConfirm_Command(object sender, CommandEventArgs e)
+        {
+            string sql = "UPDATE tbl_tmp_ex SET tmp_ex_status_approve = 1 WHERE tmp_ex_id = '" + e.CommandName.ToString() + "'";
+            if (dBScript.actionSql(sql))
+            {
+                icon = "add_alert";
+                alertType = "success";
+                alert = "อนุมัติการลาออก สำเร็จ";
+                ClearData();
+            }
+            else
+            {
+                icon = "error";
+                alertType = "danger";
+                alert = "Error : อนุมัติการลาออก ล้มเหลว!!<br/>";
+            }
+            BindData();
         }
     }
 }

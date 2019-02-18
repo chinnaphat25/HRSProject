@@ -76,7 +76,7 @@ namespace HRSProject.Config
             TimeSpan ts = _ToDate - _FromDate;
             DateTime Age = DateTime.MinValue.AddDays(ts.Days);
 
-            this.Day = Age.Day;
+            this.Day = Age.Day-1;
             this.Month = Age.Month-1;
             this.Year = Age.Year-1;
         }
@@ -88,7 +88,7 @@ namespace HRSProject.Config
                 retStr = retStr + string.Format("{0} {1} ", this.Year.ToString("#,##0"), argYearUnit);
             if (this.Month > 0)
                 retStr = retStr + string.Format("{0} {1} ", this.Month.ToString("#,##0"), argMonthUnit);
-            if (this.Day > 0)
+            if (this.Day >= 0)
                 retStr = retStr + string.Format("{0} {1} ", this.Day.ToString("#,##0"), argDayUnit);
             return retStr.Trim();
         }

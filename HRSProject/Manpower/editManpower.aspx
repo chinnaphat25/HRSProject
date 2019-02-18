@@ -34,14 +34,14 @@
     </div>
     <div class="form-row">
         <div class="col-md-1">
-            <asp:DropDownList ID="txtYear" runat="server" CssClass="form-control"></asp:DropDownList>
+            <asp:DropDownList ID="txtYear" runat="server" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="btnSearch_Click"></asp:DropDownList>
         </div>
         <div class="col-md-2">
-            <asp:DropDownList ID="txtCpoint" runat="server" CssClass="form-control"></asp:DropDownList>
+            <asp:DropDownList ID="txtCpoint" runat="server" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="btnSearch_Click"></asp:DropDownList>
         </div>
-        <div class="col-md-1">
+        <!--<div class="col-md-1">
             <asp:Button ID="btnSearch" runat="server" Text="&#xf002; ค้นหา" Font-Size="Medium" CssClass="btn btn-success btn-sm align-items-end fa" OnClick="btnSearch_Click" />
-        </div>
+        </div>-->
     </div>
     <hr />
 
@@ -65,7 +65,7 @@
                         <Columns>
                             <asp:TemplateField HeaderText="ตำแหน่ง">
                                 <ItemTemplate>
-                                    <asp:Label ID="lbAff" runat="server" Text='<%# DataBinder.Eval(Container, "DataItem.affi_name") %>'></asp:Label>
+                                    <asp:Label ID="lbAff" runat="server" Text='<%# DataBinder.Eval(Container, "DataItem.pos_name") %>'></asp:Label>
                                 </ItemTemplate>
                             </asp:TemplateField>
                             <asp:TemplateField HeaderText="อัตราเต็ม">
@@ -91,7 +91,7 @@
         <div class="col-md-5 card" id="diAdd" runat="server">
             <div class="form-row card-body">
                 <div class="col-md-5">
-                    หน่วย
+                    ตำแหน่ง
                     <asp:DropDownList ID="txtAffAdd" runat="server" CssClass="form-control" TextMode="MultiLine"></asp:DropDownList>
                 </div>
                 <div class="col-md-3">

@@ -13,6 +13,15 @@ namespace HRSProject.Profile {
     public partial class empViwe {
         
         /// <summary>
+        /// DivAdd control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DivAdd;
+        
+        /// <summary>
         /// btnAddEmp control.
         /// </summary>
         /// <remarks>
@@ -38,6 +47,24 @@ namespace HRSProject.Profile {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.LinkButton btnShEmp;
+        
+        /// <summary>
+        /// btnPrintListName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.LinkButton btnPrintListName;
+        
+        /// <summary>
+        /// DivSearch control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl DivSearch;
         
         /// <summary>
         /// txtSearchId control.
@@ -83,6 +110,15 @@ namespace HRSProject.Profile {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList txtSearchAffi;
+        
+        /// <summary>
+        /// txtSearchType control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList txtSearchType;
         
         /// <summary>
         /// btnSearchEmp control.

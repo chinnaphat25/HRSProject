@@ -12,7 +12,7 @@ namespace HRSProject.SearchHistory
         DBScript dbScript = new DBScript();
         protected void Page_Load(object sender, EventArgs e)
         {
-            if(!this.IsPostBack)
+            if (!this.IsPostBack)
             {
                 resultCard.Visible = false;
             }

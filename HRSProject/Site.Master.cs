@@ -1,5 +1,4 @@
 ﻿using HRSProject.Config;
-using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,42 +6,44 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
+
 namespace HRSProject
 {
     public partial class SiteMaster : MasterPage
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
+            if (Request.Cookies["HRSLogin"] != null)
             {
                 if (Session["User"] == null)
                 {
-                    if (Request.Cookies["cookiesLogin"] != null)
+                    Session.Add("User", Request.Cookies["HRSLogin"]["User"]);
+                    Session.Add("UserName", Request.Cookies["HRSLogin"]["UserName"]);
+                    Session.Add("UserPrivilege", Request.Cookies["HRSLogin"]["UserPrivilege"]);
+                    Session.Add("UserPrivilegeId", Request.Cookies["HRSLogin"]["UserPrivilegeId"]);
+                    if (Response.Cookies["HRSLogin"]["emp_login_id"] != null)
                     {
-                        Session["User"] = Request.Cookies["cookiesLogin"]["User"];
-                        Session["UserName"] = Request.Cookies["cookiesLogin"]["UserName"];
-                        Session["UserPrivilege"] = Request.Cookies["cookiesLogin"]["UserPrivilege"];
-                        Session["UserPrivilegeId"] = Request.Cookies["cookiesLogin"]["UserPrivilegeId"];
-                        if (Response.Cookies["cookiesLogin"]["emp_login_id"] != null)
-                        {
-                            Session["emp_login_id"] = Response.Cookies["cookiesLogin"]["emp_login_id"];
-                        }
-                        else
-                        {
-                            Session["emp_login_id"] = null;
-                        }
+                        Session["emp_login_id"] = Response.Cookies["HRSLogin"]["emp_login_id"];
                     }
                     else
                     {
-                        Response.Redirect("/Login/Login");
-                        /*Session["User"] = "";
-                        Session["UserName"] = "";
-                        Session["UserPrivilege"] = "";
-                        Session["UserPrivilegeId"] = "";*/
+                        Session["emp_login_id"] = null;
                     }
-                    new DBScript().userLoginUpdate(Session["User"].ToString());
+                    Session.Timeout = 60 * 24;
                 }
+            }
 
+            if (Session["User"] == null)
+            {
+                Response.Redirect("/Login/Login");
+            }
+            else
+            {
+                new DBScript().userLoginUpdate(Session["User"].ToString());
+            }
+
+            if (!IsPostBack)
+            {
                 if (Session["User"] != null)
                 {
                     lbUser.Text = "ยินดีต้อนรับ : คุณ" + Session["UserName"].ToString() + " : " + Session["UserPrivilege"];
@@ -54,6 +55,7 @@ namespace HRSProject
             {
                 new DBScript().userLoginUpdate(Session["User"].ToString());
             }
+
         }
 
         private void activeNav(System.Web.UI.HtmlControls.HtmlGenericControl nav)
@@ -68,9 +70,9 @@ namespace HRSProject
             Session.Clear();
             Session.Contents.RemoveAll();
             Session.RemoveAll();
-            if (Request.Cookies["cookiesLogin"] != null)
+            if (Request.Cookies["HRSLogin"] != null)
             {
-                Response.Cookies["cookiesLogin"].Expires = DateTime.Now.AddDays(-1);
+                Response.Cookies["HRSLogin"].Expires = DateTime.Now.AddDays(-1);
                 // its trick it will expire yesterday next time when will login it will be expired..
                 // because date was before 1 day from today..
             }

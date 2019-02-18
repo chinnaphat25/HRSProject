@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="TmpCpointForm.aspx.cs" Inherits="HRSProject.TmpAcation.TmpCpointForm" %>
+﻿<%@ Page Title="การโยกย้ายพนักงาน" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="TmpCpointForm.aspx.cs" Inherits="HRSProject.TmpAcation.TmpCpointForm" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <% if (alert != "")
@@ -16,20 +16,44 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-2 text-right">
+                    <asp:Label ID="Label5" runat="server" Text="รหัสบุคคล : "></asp:Label>
+                </div>
+                <div class="col-2">
+                    <asp:TextBox ID="txtEmp_id" runat="server" CssClass="form-control"></asp:TextBox>
+                </div>
+                <div class="col-1 text-right">
                     <asp:Label ID="Label1" runat="server" Text="ชื่อ-สกุล : "></asp:Label>
                 </div>
                 <div class="col-3">
                     <asp:DropDownList ID="txtEmp" runat="server" CssClass="combobox form-control"></asp:DropDownList>
                 </div>
-                <div class="col-2 text-right">
-                    <asp:Label ID="Label2" runat="server" Text="ย้ายไปที่ด่านฯ : "></asp:Label>
-                </div>
-                <div class="col-4">
-                    <asp:DropDownList ID="txtCpoint" runat="server" CssClass="form-control"></asp:DropDownList>
+                <div class="col-1 text-right">
+                    <asp:LinkButton ID="btnCheckEmp" Text="ตรวจสอบ" CssClass="btn btn-info btn-sm" Font-Size="Medium" OnClick="btnCheckEmp_Click" runat="server" />
                 </div>
             </div>
             <br />
             <div class="row">
+                <div class="col-2 text-right">
+                    <asp:Label ID="Label6" runat="server" Text="ด่านฯ : "></asp:Label>
+                </div>
+                <div class="col-2">
+                    <asp:Label ID="lbCpoint" runat="server" Text=""></asp:Label>
+                </div>
+                <div class="col-1 text-right">
+                    <asp:Label ID="Label7" runat="server" Text="ตำแหน่ง : "></asp:Label>
+                </div>
+                <div class="col-3">
+                    <asp:Label ID="lbPos" runat="server" Text=""></asp:Label>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-2 text-right">
+                    <asp:Label ID="Label2" runat="server" Text="ย้ายไปที่ด่านฯ : "></asp:Label>
+                </div>
+                <div class="col-3">
+                    <asp:DropDownList ID="txtCpoint" runat="server" CssClass="form-control"></asp:DropDownList>
+                </div>
                 <div class="col-2 text-right">
                     <asp:Label ID="Label3" runat="server" Text="วันที่ต้องย้านด่านฯ : "></asp:Label>
                 </div>
@@ -95,6 +119,12 @@
                                 <asp:Label ID="lbCountdown" runat="server"></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
+                        <asp:TemplateField HeaderText="อนุมัติ/ยืนยัน">
+                            <ItemTemplate>
+                                <asp:LinkButton ID="btnConfirm" runat="server" CssClass="btn btn-outline-warning btn-sm fa" Font-Size="Small" OnCommand="btnConfirm_Command" OnClientClick="return CompareConfirm('ยืนยันอนุมัติการย้ายด่านฯ ใช่หรือไม่');">&#xf046; อนุมัติ</asp:LinkButton>
+                                <asp:Label ID="txtConfirm" runat="server" CssClass="badge badge-success" Text="อนุมัติแล้ว"></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
                         <asp:CommandField ShowDeleteButton="True" HeaderText="ลบ" DeleteText="&#xf014; ลบ" ControlStyle-CssClass="btn btn-outline-danger btn-sm fa" ControlStyle-Font-Size="Small" />
                     </Columns>
                     <PagerStyle HorizontalAlign="Center" CssClass="GridPager" />
@@ -152,11 +182,6 @@
                                 <asp:Label ID="lbempChengDate" runat="server"></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
-                        <asp:TemplateField HeaderText="ผ่ามาแล้ว/วัน">
-                            <ItemTemplate>
-                                <asp:Label ID="lbCountdown" runat="server"></asp:Label>
-                            </ItemTemplate>
-                        </asp:TemplateField>
                     </Columns>
                     <PagerStyle HorizontalAlign="Center" CssClass="GridPager" />
                 </asp:GridView>
@@ -168,4 +193,18 @@
             </div>
         </div>
     </div>
+        <script type="text/javascript">
+        function CompareConfirm(msg) {
+            var str1 = "1";
+            var str2 = "2";
+
+            if (str1 === str2) {
+                // your logic here
+                return false;
+            } else {
+                // your logic here
+                return confirm(msg);
+            }
+        }
+    </script>
 </asp:Content>

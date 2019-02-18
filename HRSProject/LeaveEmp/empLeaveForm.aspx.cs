@@ -82,8 +82,10 @@ namespace HRSProject.LeaveEmp
         protected void GridViewEmp_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             string date_start = (string)DataBinder.Eval(e.Row.DataItem, "emp_start_working");
+            bool empfun = false;
             if (dbScript.getEmpData("type_emp_id", (string)DataBinder.Eval(e.Row.DataItem, "emp_id")) == "5")
             {
+                empfun = true;
                 string sql = "SELECT exp_moterway_start FROM tbl_exp_moterway WHERE exp_moterway_emp_id = '" + (string)DataBinder.Eval(e.Row.DataItem, "emp_id") + "' AND exp_moterway_end = '00-00-0000'";
                 MySqlDataReader rs = dbScript.selectSQL(sql);
                 if (rs.Read())
@@ -99,7 +101,7 @@ namespace HRSProject.LeaveEmp
             }
             if (date_start == null) { date_start = DateTime.Now.ToString("dd-MM-") + (DateTime.Now.Year + 543); }
 
-            Leave leave = new Leave(date_start);
+            Leave leave = new Leave(date_start, empfun);
             Leave leaveUser = new Leave((string)DataBinder.Eval(e.Row.DataItem, "emp_id"), int.Parse(dbScript.getBudgetYear()));
 
             Label lbSick = (Label)(e.Row.FindControl("lbSick"));

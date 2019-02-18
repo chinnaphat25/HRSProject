@@ -41,6 +41,7 @@ namespace HRSProject
                     Path = "~/Scripts/respond.min.js",
                     DebugPath = "~/Scripts/respond.js",
                 });
+
         }
     }
 }

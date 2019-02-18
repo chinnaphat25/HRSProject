@@ -237,6 +237,10 @@
     <Reference Include="Microsoft.ReportViewer.WebDesign, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.140.1000.523\lib\net40\Microsoft.ReportViewer.WebDesign.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.ReportViewer.WebForms, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\ClaimProject\packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.140.340.80\lib\net40\Microsoft.ReportViewer.WebForms.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.ReportViewer.WinForms, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ReportingServices.ReportViewerControl.WebForms.140.1000.523\lib\net40\Microsoft.ReportViewer.WinForms.dll</HintPath>
     </Reference>
@@ -1092,6 +1096,8 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="Guest\GuestDefault.aspx" />
+    <Content Include="Guest\GuestNewListForm.aspx" />
     <Content Include="img\7877268095078 %281%29.jpg" />
     <Content Include="img\7877268095078.jpg" />
     <Content Include="img\7877268095078_bg.jpg" />
@@ -1111,6 +1117,8 @@
     <Content Include="Manpower\yearFrom.aspx" />
     <Content Include="Profile\empForm.aspx" />
     <Content Include="Profile\empViwe.aspx" />
+    <Content Include="Profile\ReportListEmp.aspx" />
+    <Content Include="Report\Thai_government_Garuda_emblem.jpg" />
     <Content Include="Report\logo.jpg" />
     <Content Include="Scripts\bootbox.js" />
     <Content Include="Scripts\bootbox.min.js" />
@@ -1323,6 +1331,17 @@
     <Content Include="Models\LeaveDataSet.xss">
       <DependentUpon>LeaveDataSet.xsd</DependentUpon>
     </Content>
+    <Content Include="Models\ListEmpDataSet.xsc">
+      <DependentUpon>ListEmpDataSet.xsd</DependentUpon>
+    </Content>
+    <None Include="Models\ListEmpDataSet.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ListEmpDataSet.Designer.cs</LastGenOutput>
+    </None>
+    <Content Include="Models\ListEmpDataSet.xss">
+      <DependentUpon>ListEmpDataSet.xsd</DependentUpon>
+    </Content>
     <None Include="Properties\PublishProfiles\HRS_Server.pubxml" />
     <None Include="Properties\PublishProfiles\Test.pubxml" />
     <Content Include="Scripts\HRSProjectScript.js" />
@@ -1528,6 +1547,26 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Guest\GuestDefault.aspx.cs">
+      <DependentUpon>GuestDefault.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Guest\GuestDefault.aspx.designer.cs">
+      <DependentUpon>GuestDefault.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Guest\GuestNewListForm.aspx.cs">
+      <DependentUpon>GuestNewListForm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Guest\GuestNewListForm.aspx.designer.cs">
+      <DependentUpon>GuestNewListForm.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Guest\noteOffer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>noteOffer.rpt</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="LeaveEmp\empLeaveForm.aspx.cs">
       <DependentUpon>empLeaveForm.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1541,6 +1580,25 @@
     </Compile>
     <Compile Include="LeaveEmp\empLeaveHistoryForm.aspx.designer.cs">
       <DependentUpon>empLeaveHistoryForm.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ListEmpData.cs" />
+    <Compile Include="Models\ListEmpDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ListEmpDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Profile\ReportListEmp.aspx.cs">
+      <DependentUpon>ReportListEmp.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Profile\ReportListEmp.aspx.designer.cs">
+      <DependentUpon>ReportListEmp.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Profile\ReportProfile.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReportProfile.rpt</DependentUpon>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Report\reportLeaveEmp.cs">
       <AutoGen>True</AutoGen>
@@ -1697,6 +1755,14 @@
     <TypeScriptCompile Include="Scripts\index.d.ts" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Guest\noteOffer.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>noteOffer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Profile\ReportProfile.rpt">
+      <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
+      <LastGenOutput>ReportProfile.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Report\reportLeaveEmp.rpt">
       <Generator>CrystalDecisions.VSDesigner.CodeGen.ReportCodeGenerator</Generator>
       <LastGenOutput>reportLeaveEmp.cs</LastGenOutput>

@@ -27,6 +27,11 @@ namespace HRSProject.Profile
                 ScriptManager.RegisterStartupScript(Page, Page.GetType(), "ModalCheckEmp", "$('#ModalCheckEmp').modal('show');", true);
             }
 
+            if (int.Parse(Session["UserPrivilegeId"].ToString()) > 2)
+            {
+                btnAddEmp.Visible = false;
+            }
+
             if (!this.IsPostBack)
             {
                 //getSeclctEmp("emp_name", "ASC");
@@ -46,12 +51,32 @@ namespace HRSProject.Profile
                 dbScript.GetDownList(txtAffi, sql_affi, "affi_name", "affi_id");
                 dbScript.GetDownList(txtSearchAffi, sql_affi, "affi_name", "affi_id");
                 txtSearchAffi.Items.Insert(0, new ListItem("เลือก", ""));
+
+                string sql_EmpType = "SELECT * FROM tbl_type_emp";
+                dbScript.GetDownList(txtSearchType, sql_EmpType, "type_emp_name", "type_emp_id");
+                txtSearchType.Items.Insert(0, new ListItem("เลือก", ""));
             }
             dbScript.CloseConnection();
 
-            if (Session["UserPrivilegeId"].ToString() == "5" && Session["emp_login_id"].ToString()!= null)
+            if (Session["User"] != null)
             {
-                Response.Redirect("/Profile/empForm?empID=" + dbScript.getMd5Hash(Session["emp_login_id"].ToString()));
+                if (Session["UserPrivilegeId"].ToString() == "5" && Session["emp_login_id"] != null)
+                {
+                    Response.Redirect("/Profile/empForm?empID=" + dbScript.getMd5Hash(Session["emp_login_id"].ToString()));
+                }
+            }
+
+            if (!string.IsNullOrEmpty(Request.Params["pos"]) && !string.IsNullOrEmpty(Request.Params["cpoint"]))
+            {
+                if (Request.Params["cpoint"] == "60")
+                {
+                    txtSearchCpoint.Items.Insert(0, new ListItem("ฝ่ายฯ ทั้งหมด", "60"));
+                }
+                txtSearchPos.SelectedValue = Request.Params["pos"];
+                txtSearchCpoint.SelectedValue = Request.Params["cpoint"];
+                DivSearch.Visible = false;
+                DivAdd.Visible = false;
+                getSeclctEmp("emp_name", "ASC");
             }
         }
 
@@ -158,23 +183,24 @@ namespace HRSProject.Profile
 
         public void getSeclctEmp(string sortDate, string sortType)
         {
-            System.Threading.Thread.Sleep(5000);
+            //System.Threading.Thread.Sleep(5000);
             //DivLoad.Visible = true;
-            
+
 
             string strSeclctEmp = "";
             if (txtSearchId.Text != "") { strSeclctEmp += "emp_id LIKE '%" + txtSearchId.Text.Trim() + "%' "; }
             if (txtSearchName.Text != "") { if (strSeclctEmp != "") { strSeclctEmp += " AND "; } strSeclctEmp += "(profix_name LIKE '%" + txtSearchName.Text.Trim() + "%' OR emp_name LIKE '%" + txtSearchName.Text.Trim() + "%' OR emp_lname LIKE '%" + txtSearchName.Text.Trim() + "%')"; }
-            if (txtSearchCpoint.SelectedValue != "") { if (strSeclctEmp != "") { strSeclctEmp += " AND "; } strSeclctEmp += "cpoint_name LIKE '%" + txtSearchCpoint.SelectedItem + "%' "; }
-            if (txtSearchPos.SelectedValue != "") { if (strSeclctEmp != "") { strSeclctEmp += " AND "; } strSeclctEmp += "pos_name LIKE '%" + txtSearchPos.SelectedItem + "%' "; }
-            if (txtSearchAffi.SelectedValue != "") { if (strSeclctEmp != "") { strSeclctEmp += " AND "; } strSeclctEmp += "affi_name LIKE '%" + txtSearchAffi.SelectedItem + "%' "; }
+            if (txtSearchCpoint.SelectedValue != "") { if (strSeclctEmp != "") { strSeclctEmp += " AND "; } strSeclctEmp += "cpoint_id LIKE '" + txtSearchCpoint.SelectedValue + "%' "; }
+            if (txtSearchPos.SelectedValue != "") { if (strSeclctEmp != "") { strSeclctEmp += " AND "; } strSeclctEmp += "pos_id = '" + txtSearchPos.SelectedValue + "' "; }
+            if (txtSearchAffi.SelectedValue != "") { if (strSeclctEmp != "") { strSeclctEmp += " AND "; } strSeclctEmp += "affi_id = '" + txtSearchAffi.SelectedValue + "' "; }
+            if (txtSearchType.SelectedValue != "") { if (strSeclctEmp != "") { strSeclctEmp += " AND "; } strSeclctEmp += "emp_type_emp_id = '" + txtSearchType.SelectedValue + "'"; }
 
             if (strSeclctEmp != "")
             {
                 strSeclctEmp = "(" + strSeclctEmp + ") AND ";
             }
 
-            string sql = "SELECT * FROM tbl_emp_profile JOIN tbl_profix ON emp_profix_id = profix_id JOIN tbl_cpoint ON emp_cpoint_id = cpoint_id JOIN tbl_pos ON emp_pos_id = pos_id JOIN tbl_affiliation ON affi_id = emp_affi_id JOIN tbl_type_emp ON type_emp_id = emp_type_emp_id JOIN tbl_type_add ON type_add_id = emp_add_type  WHERE " + strSeclctEmp + " emp_staus_working = '1' ORDER BY " + sortDate + " " + sortType;
+            string sql = "SELECT * FROM tbl_emp_profile JOIN tbl_profix ON emp_profix_id = profix_id JOIN tbl_cpoint ON emp_cpoint_id = cpoint_id JOIN tbl_pos ON emp_pos_id = pos_id JOIN tbl_affiliation ON affi_id = emp_affi_id JOIN tbl_type_emp ON type_emp_id = emp_type_emp_id LEFT JOIN tbl_type_add ON type_add_id = emp_add_type  WHERE " + strSeclctEmp + " emp_staus_working = '1' ORDER BY " + sortDate + " " + sortType;
             Session["sqlEmp"] = sql;
             MySqlDataAdapter da = dbScript.getDataSelect(sql);
             ds = new DataTable();
@@ -344,6 +370,11 @@ namespace HRSProject.Profile
             GridViewEmp.DataSource = null;
             GridViewEmp.DataBind();
             DivEmp.Visible = false;
+        }
+
+        protected void btnPrintListName_Click(object sender, EventArgs e)
+        {
+            Page.ClientScript.RegisterStartupScript(this.GetType(), "OpenWindow", "window.open('/Profile/ReportListEmp','_newtab');", true);
         }
     }
 }

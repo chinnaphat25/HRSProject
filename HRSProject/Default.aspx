@@ -17,7 +17,27 @@
                         </div>
                         <div class="card-footer">
                             <div class="stats">
-                                <i class="fa fa-clock-o"></i>&nbsp อัปเดท <asp:Label ID="ticTime" runat="server" Text=""></asp:Label> วินาทีที่ผ่านมา
+                                <i class="fa fa-clock-o"></i>&nbsp อัปเดท
+                                <asp:Label ID="ticTime" runat="server" Text=""></asp:Label>
+                                วินาทีที่ผ่านมา
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 col-sm-6" runat="server" id="boxGuest">
+                    <div class="card card-stats">
+                        <div class="card-header card-header-info card-header-icon">
+                            <div class="card-icon">
+                                <i class="	fa fa-address-book-o"></i>
+                            </div>
+                            <h4 class="card-category">รายงานตัวพนักงานใหม่</h4>
+                            <h5 class="card-title">
+                                <asp:Label ID="LabelGuest" runat="server" Font-Size="Large"></asp:Label>
+                            </h5>
+                        </div>
+                        <div class="card-footer">
+                            <div class="stats">
+                                <a class="card-link text-secondary" href="/Guest/GuestDefault"><i class="	fa fa-address-book-o"></i>&nbsp รายงานตัวพนักงานใหม่</a>
                             </div>
                         </div>
                     </div>
@@ -44,7 +64,7 @@
                     <div class="card card-stats">
                         <div class="card-header card-header-info card-header-icon">
                             <div class="card-icon">
-                                <a class="card-link text-light" href="TmpAcation/TmpCpointForm"><i class="fa fa-exchange"></i></a>
+                                <a class="card-link text-light" href="TmpAcation/TmpCpointForm"><i class="fa fa-refresh"></i></a>
                             </div>
                             <h4 class="card-category">การโยกย้ายพนักงาน</h4>
                             <h5 class="card-title">
@@ -53,7 +73,7 @@
                         </div>
                         <div class="card-footer">
                             <div class="stats">
-                                <a class="card-link text-secondary" href="TmpAcation/TmpCpointForm"><i class="fa fa-exchange"></i>&nbsp จัดการข้อมูลการโยกย้าย</a>
+                                <a class="card-link text-secondary" href="TmpAcation/TmpCpointForm"><i class="fa fa-refresh"></i>&nbsp จัดการข้อมูลการโยกย้าย</a>
                             </div>
                         </div>
                     </div>
@@ -151,7 +171,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-7 col-md-7 col-sm-7">
+                <div class="col-lg-8 col-md-7 col-sm-7">
                     <div class="card card-stats">
                         <div class="card-header card-header-danger card-header-icon">
                             <div class="card-icon">
@@ -213,9 +233,72 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-8 col-md-6 col-sm-6" runat="server" id="Div1">
+                    <div class="card card-stats">
+                        <div class="card-header card-header-secondary card-header-icon">
+                            <div class="card-icon">
+                                <a class="card-link text-light" href="#"><i class='fa fa-user-secret'></i></a>
+                            </div>
+                            <h4 class="card-category">รายชื่อผู้เกษียณ</h4>
+                            <h4 class="card-title">ปีงบประมาณ
+                                <asp:Label ID="txtYear" runat="server" Text=""></asp:Label></h4>
+                            <h5 class="card-title">
+                                <asp:Label ID="Label7" runat="server" Text=""></asp:Label>
+                            </h5>
+                            <br />
+                            <div class="row">
+                                <div class="col-md-1">
+                                </div>
+                                <div class="col-md">
+                                    <asp:GridView ID="RetireGridView" runat="server"
+                                        DataKeyNames="emp_id"
+                                        GridLines="None" HeaderStyle-HorizontalAlign="Left"
+                                        AutoGenerateColumns="False"
+                                        CssClass="table table-hover table-sm" CellPadding="4" ForeColor="#333333">
+                                        <AlternatingRowStyle BackColor="White" />
+                                        <Columns>
+                                            <asp:BoundField DataField="emp_id" HeaderText="รหัสบุคคล">
+                                                <HeaderStyle />
+                                            </asp:BoundField>
+                                            <asp:BoundField DataField="name" HeaderText="ชื่อ-สกุล">
+                                                <HeaderStyle />
+                                            </asp:BoundField>
+                                            <asp:BoundField DataField="cpoint_name" HeaderText="ด่านฯ">
+                                                <HeaderStyle />
+                                            </asp:BoundField>
+                                            <asp:BoundField DataField="pos_name" HeaderText="ตำแหน่ง">
+                                                <HeaderStyle />
+                                            </asp:BoundField>
+                                            <asp:BoundField DataField="type_emp_name" HeaderText="ประเภท">
+                                                <HeaderStyle />
+                                            </asp:BoundField>
+                                        </Columns>
+                                        <EditRowStyle BackColor="#2461BF" />
+                                        <FooterStyle BackColor="#507CD1" Font-Bold="True" ForeColor="White" />
+                                        <HeaderStyle BackColor="#507CD1" Font-Bold="True" ForeColor="White" />
+                                        <PagerStyle BackColor="#2461BF" ForeColor="White" HorizontalAlign="Center" />
+                                        <RowStyle BackColor="#EFF3FB" HorizontalAlign="Left" />
+                                        <SelectedRowStyle BackColor="#D1DDF1" Font-Bold="True" ForeColor="#333333" />
+                                        <SortedAscendingCellStyle BackColor="#F5F7FB" />
+                                        <SortedAscendingHeaderStyle BackColor="#6D95E1" />
+                                        <SortedDescendingCellStyle BackColor="#E9EBEF" />
+                                        <SortedDescendingHeaderStyle BackColor="#4870BE" />
+                                    </asp:GridView>
+                                </div>
+                                <div class="col-md-1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="stats">
+                                <i class="fa fa-clock-o"></i>&nbsp อัปเดท 30 วินาทีที่ผ่านมา
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <asp:Timer ID="Timer1" runat="server" Interval="30000" OnTick="Timer1_Tick"></asp:Timer>
         </ContentTemplate>
     </asp:UpdatePanel>
-    
+
 </asp:Content>

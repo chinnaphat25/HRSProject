@@ -63,7 +63,7 @@ namespace HRSProject.Config
             bScript.CloseConnection();
         }
 
-        public Leave(string date)
+        public Leave(string date,bool Empfun)
         {
             string[] dateSub = date.Split('-');
             dateS = DateTime.ParseExact(dateSub[0] + "-" + dateSub[1] + "-" + (int.Parse(dateSub[2]) - 543), "dd-MM-yyyy", CultureInfo.InvariantCulture);
@@ -72,7 +72,7 @@ namespace HRSProject.Config
             Date6Month = dateToString(dateS.AddMonths(6));
             Date1Year = dateToString(dateS.AddYears(1));
             getBudgetYear(dateS);
-            leaveDay(dateS);
+            leaveDay(dateS, Empfun);
         }
 
         private string dateToString(DateTime date)
@@ -140,7 +140,7 @@ namespace HRSProject.Config
             }
         }
 
-        private void leaveDay(DateTime date)
+        private void leaveDay(DateTime date,bool Empfun)
         {
             try
             {
@@ -153,9 +153,9 @@ namespace HRSProject.Config
                 Day = Age.Day - 1;
                 Month = Age.Month - 1;
                 Year = Age.Year - 1;
-                if (Year > 1)
+                if (Year >= 1)
                 {
-                    if (new DBScript().getEmpData("emp_type_emp_id", EmpID) == "5")
+                    if (Empfun)
                     {
                         Sick = 30;
                         Relax = 10;
@@ -171,10 +171,13 @@ namespace HRSProject.Config
                 }
                 else if (Year < 1 && Month >= 6)
                 {
-                    if (new DBScript().getEmpData("emp_type_emp_id", EmpID) == "5")
+                    if (Empfun)
                     {
-                        Sick = 8;
+                        Sick = 30;
                         Relax = 10;
+                        Maternity = 90;
+                        Military = 1;
+                        Ordain = 1;
                     }
                     else
                     {
@@ -184,55 +187,123 @@ namespace HRSProject.Config
                                 Sick = 15;
                                 Relax = 10;
                                 break;
-                            case 11:
+                            default:
                                 Sick = 8;
-                                Relax = 9;
-                                break;
-                            case 12:
-                                Sick = 8;
-                                Relax = 8;
-                                break;
-                            case 1:
-                                Sick = 8;
-                                Relax = 7;
-                                break;
-                            case 2:
-                                Sick = 8;
-                                Relax = 6;
-                                break;
-                            case 3:
-                                Sick = 8;
-                                Relax = 5;
-                                break;
-                            case 4:
-                                Sick = 8;
-                                Relax = 4;
-                                break;
-                            case 5:
-                                Sick = 8;
-                                Relax = 3;
-                                break;
-                            case 6:
-                                Sick = 8;
-                                Relax = 2;
-                                break;
-                            case 7:
-                                Sick = 8;
-                                Relax = 1;
-                                break;
-                            case 8:
-                                Sick = 8;
-                                Relax = 0;
-                                break;
-                            case 9:
-                                Sick = 8;
-                                Relax = 0;
                                 break;
                         }
+                        Relax = 0;
                         Maternity = 90;
                         Military = 1;
                         Ordain = 1;
                     }
+                }
+                else if(Year == 1)
+                {
+                    switch (date.Month)
+                    {
+                        case 10:
+                            Sick = 15;
+                            Relax = 10;
+                            break;
+                        case 11:
+                            if (date.Month == DateTime.Now.Month)
+                            {
+                                Relax = 9;
+                            }
+                            else
+                            {
+                                Relax = 0;
+                            }
+                            break;
+                        case 12:
+                            if (date.Month == DateTime.Now.Month)
+                            {
+                                Relax = 8;
+                            }
+                            else
+                            {
+                                Relax = 0;
+                            }
+                            break;
+                        case 1:
+                            if (date.Month == DateTime.Now.Month)
+                            {
+                                Relax = 7;
+                            }
+                            else
+                            {
+                                Relax = 0;
+                            }
+                            break;
+                        case 2:
+                            if (date.Month == DateTime.Now.Month)
+                            {
+                                Relax = 6;
+                            }
+                            else
+                            {
+                                Relax = 0;
+                            }
+                            break;
+                        case 3:
+                            if (date.Month == DateTime.Now.Month)
+                            {
+                                Relax = 5;
+                            }
+                            else
+                            {
+                                Relax = 0;
+                            }
+                            break;
+                        case 4:
+                            if (date.Month == DateTime.Now.Month)
+                            {
+                                Relax = 4;
+                            }
+                            else
+                            {
+                                Relax = 0;
+                            }
+                            break;
+                        case 5:
+                            if (date.Month == DateTime.Now.Month)
+                            {
+                                Relax = 3;
+                            }
+                            else
+                            {
+                                Relax = 0;
+                            }
+                            break;
+                        case 6:
+                            if (date.Month == DateTime.Now.Month)
+                            {
+                                Relax = 2;
+                            }
+                            else
+                            {
+                                Relax = 0;
+                            }
+                            break;
+                        case 7:
+                            if (date.Month == DateTime.Now.Month)
+                            {
+                                Relax = 1;
+                            }
+                            else
+                            {
+                                Relax = 0;
+                            }
+                            break;
+                        default:
+                            Relax = 0;
+                            break;
+
+                    }
+                    Sick = 8;
+                    Maternity = 90;
+                    Military = 1;
+                    Ordain = 1;
                 }
                 /*else
                 {

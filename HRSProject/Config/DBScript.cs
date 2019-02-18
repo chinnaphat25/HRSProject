@@ -14,15 +14,30 @@ namespace HRSProject.Config
         MySqlConnection Conn;
         int ArraySize = 300;
         //MySqlCommand cmd;
+        public string strConnString = "Server=10.6.3.201;User Id=adminhr; Password=admin25;charset=tis620; Database=hrsystem; Pooling=false";  //Depoly Server
+        //public string strConnString = "Server=10.6.3.201;User Id=adminhrs; Password=admin25;charset=tis620; Database=hrs_db; Pooling=false";  //Depoly Test
+        //public string strConnString = "Server=10.6.3.175;User Id=adminhrs; Password=admin25; Database=hrs_test; Pooling=false";  //Test
         public DBScript()
         {
-            string strConnString = "Server=10.6.3.201;User Id=adminhrs; Password=admin25;charset=tis620; Database=hrs_db; Pooling=false";  //Depoly Server
-            //string strConnString = "Server=10.6.3.201;User Id=hrstest; Password=admin25;charset=tis620; Database=hrs_db; Pooling=false";  //Depoly Test
-            //string strConnString = "Server=10.6.3.175;User Id=adminhrs; Password=admin25; Database=hrs_test; Pooling=false";  //Test
             Conn = new MySqlConnection(strConnString);
+        }
+
+        public void Set_Max_Connection()
+        {
+            try
+            {
+                string sql = "SET global max_connections = 1000000";
+                Conn.Open();
+                MySqlCommand comm = Conn.CreateCommand();
+                comm.CommandText = sql;
+                comm.ExecuteNonQuery();
+                Conn.Close();
+            }
+            catch { Conn.Close(); }
         }
         private bool openConn()
         {
+            //Set_Max_Connection();
             if (Conn != null && Conn.State == ConnectionState.Closed)//to check if conn is already open or not
             {
                 Conn.Open();
@@ -51,11 +66,27 @@ namespace HRSProject.Config
 
         public MySqlDataReader selectSQL(string sql)
         {
-                MySqlCommand cmd = Conn.CreateCommand();
-                cmd.CommandText = sql;
-                openConn();
-                MySqlDataReader result = cmd.ExecuteReader();
-                return result;
+            MySqlCommand cmd = Conn.CreateCommand();
+            cmd.CommandText = sql;
+            openConn();
+            MySqlDataReader result = cmd.ExecuteReader();
+            return result;
+        }
+
+        public string GetSelectData(string sql)
+        {
+            MySqlCommand cmd = Conn.CreateCommand();
+            cmd.CommandText = sql;
+            openConn();
+            MySqlDataReader result = cmd.ExecuteReader();
+            string data = "";
+            if (result.Read())
+            {
+                data = result.GetString(0);
+            }
+            result.Close();
+            closeConn();
+            return data;
         }
 
         public Boolean actionSql(string sql)
@@ -83,6 +114,30 @@ namespace HRSProject.Config
             }
         }
 
+        public string InsertQueryPK(string sql)
+        {
+            openConn();
+            MySqlCommand cmd = Conn.CreateCommand();
+            cmd.CommandText = sql;
+            string Str_return = "";
+            try
+            {
+                if (cmd.ExecuteNonQuery() > 0)
+                {
+                    cmd.CommandText = "SELECT LAST_INSERT_ID() AS gID";
+                    Str_return = cmd.ExecuteScalar().ToString();
+                }
+
+                closeConn();
+                return Str_return;
+            }
+            catch
+            {
+                closeConn();
+                return Str_return;
+            }
+        }
+
         public string getEmpData(string data, string empId)
         {
             string sql = "SELECT " + data + " FROM tbl_emp_profile JOIN tbl_profix ON emp_profix_id = profix_id JOIN tbl_cpoint ON emp_cpoint_id = cpoint_id JOIN tbl_pos ON emp_pos_id = pos_id JOIN tbl_affiliation ON affi_id = emp_affi_id JOIN tbl_type_emp ON type_emp_id = emp_type_emp_id JOIN tbl_type_add ON type_add_id = emp_add_type WHERE emp_id = '" + empId + "'";
@@ -101,7 +156,7 @@ namespace HRSProject.Config
 
         public string getEmpDataIDCard(string data, string idcard)
         {
-            string sql = "SELECT " + data + " FROM tbl_emp_profile WHERE emp_id_card = '" + idcard + "'";
+            string sql = "SELECT " + data + " FROM tbl_emp_profile WHERE emp_id_card = '" + idcard + "' AND emp_staus_working = '1' ORDER BY id DESC";
             string detali = "";
             MySqlDataReader rs = selectSQL(sql);
             if (rs.Read())
@@ -117,7 +172,7 @@ namespace HRSProject.Config
 
         public string getEmpIDMD5(string data, string empId)
         {
-            string sql = "SELECT " + data + " FROM tbl_emp_profile JOIN tbl_profix ON emp_profix_id = profix_id JOIN tbl_cpoint ON emp_cpoint_id = cpoint_id JOIN tbl_pos ON emp_pos_id = pos_id JOIN tbl_affiliation ON affi_id = emp_affi_id JOIN tbl_type_emp ON type_emp_id = emp_type_emp_id JOIN tbl_type_add ON type_add_id = emp_add_type WHERE MD5(emp_id) = '" + empId + "'";
+            string sql = "SELECT " + data + " FROM tbl_emp_profile JOIN tbl_profix ON emp_profix_id = profix_id JOIN tbl_cpoint ON emp_cpoint_id = cpoint_id JOIN tbl_pos ON emp_pos_id = pos_id JOIN tbl_affiliation ON affi_id = emp_affi_id JOIN tbl_type_emp ON type_emp_id = emp_type_emp_id LEFT JOIN tbl_type_add ON type_add_id = emp_add_type WHERE MD5(emp_id) = '" + empId + "' ORDER BY id DESC";
             string detali = "";
             MySqlDataReader rs = selectSQL(sql);
             if (rs.Read())
@@ -210,7 +265,7 @@ namespace HRSProject.Config
                     case "00":
                         return "ปัจจุบัน";
                 }
-                return subDate[0] + " " + subDate[1] + " " + subDate[2];
+                return int.Parse(subDate[0]) + " " + subDate[1] + " " + subDate[2];
             }
             catch
             {
@@ -264,7 +319,7 @@ namespace HRSProject.Config
                     case "00":
                         return "ปัจจุบัน";
                 }
-                return subDate[0] + " " + subDate[1] + " " + subDate[2];
+                return int.Parse(subDate[0]) + " " + subDate[1] + " " + subDate[2];
             }
             catch
             {
@@ -338,8 +393,8 @@ namespace HRSProject.Config
 
         public string getBudgetYear(string date)
         {
-            string d = date.Split('-')[0] + "-" + date.Split('-')[1]+ "-"+ (int.Parse(date.Split('-')[2]) - 543);
-            DateTime dateTime = DateTime.ParseExact(d,"dd-MM-yyyy", CultureInfo.InvariantCulture);
+            string d = date.Split('-')[0] + "-" + date.Split('-')[1] + "-" + (int.Parse(date.Split('-')[2]) - 543);
+            DateTime dateTime = DateTime.ParseExact(d, "dd-MM-yyyy", CultureInfo.InvariantCulture);
 
             if (dateTime.Month < 10)
             {
@@ -366,6 +421,25 @@ namespace HRSProject.Config
                 }
                 reader.Close();
             }
+        }
+
+        public Boolean checkDupicalIDCard(string idcard)
+        {
+            string sql = "SELECT * FROM tbl_emp_profile WHERE emp_id_card = '" + idcard + "' AND emp_staus_working = '1'";
+            MySqlDataReader rs = selectSQL(sql);
+            if (rs.Read())
+            {
+                rs.Close();
+                CloseConnection();
+                return false;
+            }
+            else
+            {
+                rs.Close();
+                CloseConnection();
+                return true;
+            }
+            
         }
 
         public Boolean checkIDCard(String PID)
@@ -418,7 +492,7 @@ namespace HRSProject.Config
 
         public void UpdateEmpEx()
         {
-            string sql = "SELECT * FROM tbl_tmp_ex WHERE DATE_ADD(STR_TO_DATE(tmp_ex_date, '%d-%m-%Y'),INTERVAL -543 YEAR) <= CURDATE() AND tmp_ex_status = 0";
+            string sql = "SELECT * FROM tbl_tmp_ex WHERE DATE_ADD(STR_TO_DATE(tmp_ex_date, '%d-%m-%Y'),INTERVAL -543 YEAR) <= CURDATE() AND tmp_ex_status = 0 AND tmp_ex_status_approve = 1";
             MySqlDataReader rs = selectSQL(sql);
             int i = 0;
             TmpExitEmp[] tmpExits = new TmpExitEmp[ArraySize];
@@ -446,7 +520,7 @@ namespace HRSProject.Config
 
         public void UpdateEmpCpoint()
         {
-            string sql = "SELECT * FROM tbl_tmp_cpoint WHERE DATE_ADD(STR_TO_DATE(tmp_cpoint_date, '%d-%m-%Y'),INTERVAL -543 YEAR) <= CURDATE() AND tmp_cpoint_status = 0";
+            string sql = "SELECT * FROM tbl_tmp_cpoint WHERE DATE_ADD(STR_TO_DATE(tmp_cpoint_date, '%d-%m-%Y'),INTERVAL -543 YEAR) <= CURDATE() AND tmp_cpoint_status = 0 AND tmp_cpoint_status_approve = 1";
             MySqlDataReader rs = selectSQL(sql);
             int i = 0;
             TmpCpointEmp[] tmpCpoint = new TmpCpointEmp[ArraySize];
@@ -462,11 +536,11 @@ namespace HRSProject.Config
             {
                 if (tmp != null)
                 {
-                    string sql_update = "UPDATE tbl_work_history SET work_history_out = '"+new DBScript().DateCalculation(tmp.Tmp_cpoint_date,-1)+"' where work_history_emp_id = '"+tmp.Tmp_cpoint_emp_id+"' AND work_history_out = '00-00-0000'";
+                    string sql_update = "UPDATE tbl_work_history SET work_history_out = '" + new DBScript().DateCalculation(tmp.Tmp_cpoint_date, -1) + "' where work_history_emp_id = '" + tmp.Tmp_cpoint_emp_id + "' AND work_history_out = '00-00-0000'";
                     actionSql(sql_update);
-                    sql_update = "insert into tbl_work_history (work_history_in,work_history_out,work_history_pos,work_history_aff,work_history_cpoint,work_history_emp_id) values ('"+tmp.Tmp_cpoint_date+"','00-00-0000','"+new DBScript().getEmpData("emp_pos_id", tmp.Tmp_cpoint_emp_id) +"','"+ new DBScript().getEmpData("emp_affi_id", tmp.Tmp_cpoint_emp_id) + "','"+tmp.Tmp_cpoint_cpoint_id+"','"+ tmp.Tmp_cpoint_emp_id + "')";
+                    sql_update = "insert into tbl_work_history (work_history_in,work_history_out,work_history_pos,work_history_aff,work_history_cpoint,work_history_emp_id) values ('" + tmp.Tmp_cpoint_date + "','00-00-0000','" + new DBScript().getEmpData("emp_pos_id", tmp.Tmp_cpoint_emp_id) + "','" + new DBScript().getEmpData("emp_affi_id", tmp.Tmp_cpoint_emp_id) + "','" + tmp.Tmp_cpoint_cpoint_id + "','" + tmp.Tmp_cpoint_emp_id + "')";
                     actionSql(sql_update);
-                    sql_update = "UPDATE tbl_emp_profile SET emp_cpoint_id = '"+tmp.Tmp_cpoint_cpoint_id+"' WHERE emp_id = '"+tmp.Tmp_cpoint_emp_id+"'";
+                    sql_update = "UPDATE tbl_emp_profile SET emp_cpoint_id = '" + tmp.Tmp_cpoint_cpoint_id + "' WHERE emp_id = '" + tmp.Tmp_cpoint_emp_id + "'";
                     actionSql(sql_update);
                     sql_update = "UPDATE tbl_tmp_cpoint SET tmp_cpoint_status = '1' WHERE tmp_cpoint_emp_id = '" + tmp.Tmp_cpoint_emp_id + "' AND tmp_cpoint_status = '0'";
                     actionSql(sql_update);
@@ -476,7 +550,7 @@ namespace HRSProject.Config
 
         public void UpdateEmpPos()
         {
-            string sql = "SELECT * FROM tbl_tmp_pos WHERE DATE_ADD(STR_TO_DATE(tmp_pos_date, '%d-%m-%Y'),INTERVAL -543 YEAR) <= CURDATE() AND tmp_pos_status = 0";
+            string sql = "SELECT * FROM tbl_tmp_pos WHERE DATE_ADD(STR_TO_DATE(tmp_pos_date, '%d-%m-%Y'),INTERVAL -543 YEAR) <= CURDATE() AND tmp_pos_status = 0 AND tmp_pos_status_approve = 1";
             MySqlDataReader rs = selectSQL(sql);
             int i = 0;
             TmpPosEmp[] tmpPos = new TmpPosEmp[ArraySize];
@@ -492,12 +566,12 @@ namespace HRSProject.Config
             {
                 if (tmp != null)
                 {
-                    string sql_update = "UPDATE tbl_exp_moterway SET exp_moterway_end = '" + new DBScript().DateCalculation(tmp.Tmp_pos_date, -1) + "' WHERE exp_moterway_emp_id = '"+tmp.Tmp_pos_emp_id+"' AND exp_moterway_end = '00-00-0000'";
+                    string sql_update = "UPDATE tbl_exp_moterway SET exp_moterway_end = '" + new DBScript().DateCalculation(tmp.Tmp_pos_date, -1) + "' WHERE exp_moterway_emp_id = '" + tmp.Tmp_pos_emp_id + "' AND exp_moterway_end = '00-00-0000'";
                     actionSql(sql_update);
                     sql_update = "insert into tbl_exp_moterway (exp_moterway_start,exp_moterway_end,exp_moterway_pos,exp_moterway_saraly,exp_moterway_emp_id) ";
                     sql_update += " values ('" + tmp.Tmp_pos_date + "','00-00-0000','" + tmp.Tmp_pos_pos_id + "','0','" + tmp.Tmp_pos_emp_id + "')";
                     actionSql(sql_update);
-                    sql_update = "UPDATE tbl_emp_profile SET emp_pos_id = '"+tmp.Tmp_pos_pos_id+"',emp_affi_id = '"+tmp.Tmp_pos_aff_id+"',emp_type_emp_id = '"+tmp.Tmp_pos_emp_type_id+"' WHERE emp_id = '" + tmp.Tmp_pos_emp_id + "'";
+                    sql_update = "UPDATE tbl_emp_profile SET emp_pos_id = '" + tmp.Tmp_pos_pos_id + "',emp_affi_id = '" + tmp.Tmp_pos_aff_id + "',emp_type_emp_id = '" + tmp.Tmp_pos_emp_type_id + "' WHERE emp_id = '" + tmp.Tmp_pos_emp_id + "'";
                     actionSql(sql_update);
                     sql_update = "UPDATE tbl_tmp_pos SET tmp_pos_status = '1' WHERE tmp_pos_emp_id = '" + tmp.Tmp_pos_emp_id + "' AND tmp_pos_status = '0'";
                     actionSql(sql_update);
@@ -505,11 +579,19 @@ namespace HRSProject.Config
             }
         }
 
-        public string DateCalculation(string date,int cal)
+        public string DateCalculation(string date, int cal)
         {
             DateTime ds = DateTime.ParseExact(date, "dd-MM-" + (int.Parse(date.Split('-')[2])), CultureInfo.InvariantCulture);
             ds.AddDays(cal);
-            return ds.ToString("dd-MM-")+(int.Parse(ds.ToString("yyyy"))+543);
+            return ds.ToString("dd-MM-") + (int.Parse(ds.ToString("yyyy")) + 543);
+        }
+
+        public DateTime DateCalculationK(string date, int cal)
+        {
+            string date_txt = date.Split('-')[0] + "-" + date.Split('-')[1] + "-" + (int.Parse(date.Split('-')[2]) - 543);
+            DateTime ds = DateTime.ParseExact(date_txt, "dd-MM-yyyy", CultureInfo.InvariantCulture);
+            ds.AddDays(cal);
+            return ds;
         }
 
         public void CreateMotowayWorking()
@@ -524,7 +606,7 @@ namespace HRSProject.Config
             {
                 //TextBox1.Text = row["ImagePath"].ToString();
                 string sql_insert = "INSERT INTO tbl_exp_moterway (exp_moterway_start,exp_moterway_end,exp_moterway_pos,exp_moterway_emp_id) VALUES ";
-                sql_insert += " ('" + row["emp_start_working"].ToString()+ "','00-00-0000','" + row["emp_pos_id"].ToString() + "','" + row["emp_id"].ToString() + "')";
+                sql_insert += " ('" + row["emp_start_working"].ToString() + "','00-00-0000','" + row["emp_pos_id"].ToString() + "','" + row["emp_id"].ToString() + "')";
                 actionSql(sql_insert);
             }
         }
@@ -557,13 +639,13 @@ namespace HRSProject.Config
                     }
                     break;
                 case "Admin":
-                    if (privilege == "0"|| privilege == "1")
+                    if (privilege == "0" || privilege == "1")
                     {
                         return true;
                     }
                     break;
                 case "HR":
-                    if (privilege == "0" || privilege == "1"|| privilege == "2")
+                    if (privilege == "0" || privilege == "1" || privilege == "2")
                     {
                         return true;
                     }
@@ -591,9 +673,9 @@ namespace HRSProject.Config
             return false;
         }
 
-        public bool Notallow(string[] privilege,string session)
+        public bool Notallow(string[] privilege, string session)
         {
-            foreach(string right in privilege)
+            foreach (string right in privilege)
             {
                 if (right == session)
                 {
@@ -601,6 +683,22 @@ namespace HRSProject.Config
                 }
             }
             return false;
+        }
+
+        public int selectCount(string table, string condition, string group)
+        {
+            int amount = 0;
+            MySqlCommand cmd = Conn.CreateCommand();
+            cmd.CommandText = "SELECT COUNT(*) AS num FROM " + table + " WHERE " + condition + " GROUP BY " + group;
+            openConn();
+            MySqlDataReader result = cmd.ExecuteReader();
+            if (result.Read())
+            {
+                amount = (int)result.GetDecimal("num");
+            }
+            result.Close();
+            closeConn();
+            return amount;
         }
 
     }

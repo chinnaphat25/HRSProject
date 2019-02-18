@@ -106,6 +106,10 @@
                                     นามสกุล
                     <asp:TextBox ID="txtLname" runat="server" MaxLength="50" CssClass="form-control"></asp:TextBox>
                                 </div>
+                                <div class="col-md-2">
+                                    รหัสตำแหน่ง
+                        <asp:TextBox ID="txtPosNum" runat="server" CssClass="form-control"></asp:TextBox>
+                                </div>
                             </div>
                             <div class="form-row">
                                 <div class="col-md-4">

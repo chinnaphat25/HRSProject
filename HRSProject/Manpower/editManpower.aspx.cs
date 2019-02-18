@@ -11,6 +11,7 @@ namespace HRSProject.Manpower
         DBScript dBScript = new DBScript();
         protected void Page_Load(object sender, EventArgs e)
         {
+
             if (!this.IsPostBack)
             {
                 string sql_cpoint = "SELECT * FROM tbl_cpoint";
@@ -19,8 +20,8 @@ namespace HRSProject.Manpower
                 string sql_year = "SELECT * FROM tbl_year";
                 GetDownList(txtYear, sql_year, "year", "year");
 
-                string sql_aff = "SELECT * FROM tbl_affiliation ORDER BY affi_name";
-                GetDownList(txtAffAdd, sql_aff, "affi_name", "affi_id");
+                string sql_aff = "SELECT * FROM tbl_pos ORDER BY pos_name";
+                GetDownList(txtAffAdd, sql_aff, "pos_name", "pos_id");
 
                 diAdd.Visible = false;
                 //BindData();
@@ -29,7 +30,7 @@ namespace HRSProject.Manpower
 
         void BindData()
         {
-            string sql = "SELECT * FROM tbl_manpower LEFT JOIN tbl_cpoint ON manpower_cpoint_id = cpoint_id LEFT JOIN tbl_affiliation ON affi_id = manpower_pos_id WHERE manpower_year = '" + txtYear.SelectedValue + "' AND manpower_cpoint_id = '" + txtCpoint.SelectedValue + "'";
+            string sql = "SELECT * FROM tbl_manpower LEFT JOIN tbl_cpoint ON manpower_cpoint_id = cpoint_id LEFT JOIN tbl_pos ON pos_id = manpower_pos_id WHERE manpower_year = '" + txtYear.SelectedValue + "' AND manpower_cpoint_id = '" + txtCpoint.SelectedValue + "'";
             MySqlDataAdapter da = dBScript.getDataSelect(sql);
             DataSet ds = new DataSet();
             da.Fill(ds);
@@ -94,6 +95,7 @@ namespace HRSProject.Manpower
                 if (dBScript.actionSql(sql))
                 {
                     msgSuccess.Text = "เพิ่มอัตรากำลัง " + txtCpoint.SelectedItem + " สำเร็จ<br/>";
+                    txtFullAdd.Text = "";
                 }
                 else
                 {
@@ -144,8 +146,9 @@ namespace HRSProject.Manpower
             msgErr.Text = "";
             msgAlert.Text = "";
             TextBox txtTypeAdd = (TextBox)ManPowerGridView.Rows[e.RowIndex].FindControl("txtTypeAdd");
+            TextBox txtFullEdit = (TextBox)ManPowerGridView.Rows[e.RowIndex].FindControl("txtFullEdit");
 
-            string sql = "UPDATE tbl_manpower SET manpower_full='" + txtFullAdd.Text + "' WHERE manpower_id = '" + ManPowerGridView.DataKeys[e.RowIndex].Value + "'";
+            string sql = "UPDATE tbl_manpower SET manpower_full='" + txtFullEdit.Text + "' WHERE manpower_id = '" + ManPowerGridView.DataKeys[e.RowIndex].Value + "'";
             if (dBScript.actionSql(sql))
             {
                 msgSuccess.Text = "แก้ไขอัตรากำลัง " + txtCpoint.SelectedItem + " สำเร็จ<br/>";
@@ -157,6 +160,7 @@ namespace HRSProject.Manpower
             ManPowerGridView.EditIndex = -1;
             BindData();
         }
+
     }
 
 }
